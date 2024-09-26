@@ -1,0 +1,13 @@
+# Default line ending behaviour
+* text=auto eol=lf
+
+# Files that should always have LF line endings
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.php text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Files that should never have their line endings modified
+*.ico binary
