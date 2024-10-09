@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "client": "vite",
+        "server": "tsx server/index.ts",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
@@ -12,10 +13,12 @@
     },
     "dependencies": {
         "@mui/material": "^6.1.1",
+        "express": "^4.21.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
+        "@types/express": "^5.0.0",
         "@types/react": "^18.3.3",
         "@types/react-dom": "^18.3.0",
         "@vitejs/plugin-react": "^4.3.1",
@@ -27,6 +30,7 @@
         "husky": "^9.1.6",
         "lint-staged": "^15.2.10",
         "prettier": "^3.3.3",
+        "tsx": "^4.19.1",
         "typescript": "^5.5.3",
         "typescript-eslint": "^8.0.1",
         "vite": "^5.4.1"
