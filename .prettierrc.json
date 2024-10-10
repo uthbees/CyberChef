@@ -9,5 +9,13 @@
     "trailingComma": "all",
     "bracketSpacing": true,
     "bracketSameLine": false,
-    "arrowParens": "always"
+    "arrowParens": "always",
+    "overrides": [
+        {
+            "files": ["**/*.yaml", "**/*.yml"],
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ]
 }
