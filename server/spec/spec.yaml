@@ -1,0 +1,20 @@
+openapi: 3.1.0
+info:
+  version: '1.0.0'
+  title: CyberChef
+
+paths:
+  '/example':
+    get:
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hello:
+                    type: string
+              example:
+                hello: world

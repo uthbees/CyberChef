@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>REST API Docs</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.css"
+            integrity="sha512-MvYROlKG3cDBPskMQgPmkNgZh85LIf68y7SZ34TIppaIHQz1M/3S/yYqzIfufdKDJjzB9Qu1BV63SZjimJkPvw=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+    </head>
+    <body>
+        <div id="swagger-ui"></div>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.js"
+            integrity="sha512-mVvFSCxt0sK0FeL8C7n8BcHh10quzdwfxQbjRaw9pRdKNNep3YQusJS5e2/q4GYt4Ma5yWXSJraoQzXPgZd2EQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <script>
+            window.onload = function () {
+                SwaggerUIBundle({
+                    operationsSorter: (a, b) => {
+                        const order = {
+                            get: '0',
+                            post: '1',
+                            patch: '2',
+                            put: '3',
+                            delete: '4',
+                            head: '5',
+                            options: '6',
+                            connect: '7',
+                            trace: '8',
+                        };
+                        return (
+                            a.get('path').localeCompare(b.get('path')) ||
+                            order[a.get('method')].localeCompare(
+                                order[b.get('method')],
+                            )
+                        );
+                    },
+                    url: './spec',
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,
+                    defaultModelsExpandDepth: -1,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIBundle.SwaggerUIStandalonePreset,
+                    ],
+                });
+            };
+        </script>
+    </body>
+</html>
