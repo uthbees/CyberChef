@@ -4,17 +4,125 @@ info:
   title: CyberChef
 
 paths:
-  '/example':
+  /recipes:
     get:
+      description: Get all recipes.
       responses:
-        '200':
-          description: Ok
+        200:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  hello:
-                    type: string
-              example:
-                hello: world
+                $ref: '#/components/schemas/Recipe'
+    post:
+      description: Create a recipe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-data-Recipe'
+      responses:
+        201:
+          $ref: '#/components/responses/201-created'
+        400:
+          $ref: '#/components/responses/400-generic-bad-request'
+
+components:
+  schemas:
+    Recipe:
+      allOf:
+        - $ref: '#/components/schemas/uuid'
+        - $ref: '#/components/schemas/user-data-Recipe'
+    user-data-Recipe:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        difficulty:
+          type: string
+          enum: ['Easy', 'Intermediate', 'Expert']
+        prep_time:
+          type: integer
+        cook_time:
+          type: integer
+        ingredients:
+          type: array
+          items:
+            type: object
+            properties:
+              quantity:
+                type: number
+              unit:
+                type: string
+              name:
+                type: string
+            required:
+              - quantity
+              - name
+        instructions:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+      required:
+        - name
+        - description
+        - difficulty
+        - prep_time
+        - cook_time
+        - ingredients
+        - instructions
+        - notes
+      example:
+        name: Simple Cookies
+        description: A simple recipe for basic cookies.
+        difficulty: Easy
+        prep_time: 20
+        cook_time: 12
+        ingredients:
+          - quantity: 1
+            unit: cup
+            name: unsalted butter, softened
+          - quantity: 1
+            unit: cup
+            name: granulated sugar
+          - quantity: 2
+            name: eggs
+          - quantity: 2.25
+            unit: cups
+            name: all-purpose flour
+        instructions:
+          - Preheat oven to 375 degrees F (190 degrees C).
+          - In a large bowl, cream together butter and granulated sugar until light and fluffy.
+          - Beat in eggs one at a time, then gradually add flour.
+          - Drop by rounded tablespoons onto ungreased baking sheets.
+          - Bake for 10-12 minutes, or until golden brown.
+        notes: For a chewier cookie, underbake slightly. For a crispier cookie, bake for a few extra minutes.
+    uuid:
+      type: object
+      properties:
+        uuid:
+          type: string
+      required:
+        - uuid
+      example:
+        uuid: 32c7b48a-c272-4d31-b9d3-fde3ae00bf2d
+  responses:
+    201-created:
+      description: The resource was successfully created.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              uuid:
+                type: string
+            required:
+              - uuid
+            example:
+              uuid: c1a93f96-a088-4764-97a2-361976fa4881
+    400-generic-bad-request:
+      description: Invalid parameter and/or request body.
