@@ -1,3 +1,3 @@
 export default function RecipeCreationPage() {
-    return 'stub implementation';
+    return 'stub implementation - recipe creation';
 }

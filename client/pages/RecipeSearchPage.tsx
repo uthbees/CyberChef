@@ -1,3 +1,3 @@
 export default function RecipeSearchPage() {
-    return 'stub implementation';
+    return 'stub implementation - recipe search';
 }
