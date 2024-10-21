@@ -5,7 +5,7 @@ import react from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config({
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['{client,server}/**/*.{ts,tsx}'],
     plugins: {
         react: react,
         'react-hooks': reactHooks,
@@ -31,7 +31,7 @@ export default tseslint.config({
         ecmaVersion: 2020,
         globals: globals.browser,
         parserOptions: {
-            project: ['./tsconfig.vite.json', './tsconfig.app.json'],
+            project: ['./tsconfig.json'],
         },
     },
 });
