@@ -12,7 +12,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Recipe'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
     post:
       description: Create a recipe.
       requestBody:
