@@ -15,23 +15,20 @@ export default function AppHeader() {
                 <AppHeaderLink name="Browse Recipes" to="/recipes" />
                 <AppHeaderLink name="Create Recipe" to="/recipes/create" />
                 <div style={{ marginLeft: 'auto' }}>
-                    <div className="appHeaderIcon appHeaderButton">
-                        <ShoppingListButton />
-                    </div>
+                    <ShoppingListButton />
                 </div>
             </Stack>
         </AppBar>
     );
 }
 
-// TODO: Figure out how to make the mui buttons work with links so that the app
-//  header links can be consistent with the icon
 function AppHeaderLink({ name, to }: { name: string; to: string }) {
     return (
         <Button
             component={Link}
             to={to}
-            className="appHeaderLink appHeaderButton"
+            style={{ color: 'white' }}
+            variant="outlined"
         >
             <Typography>{name}</Typography>
         </Button>
