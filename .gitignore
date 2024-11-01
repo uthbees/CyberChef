@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 build
 
+server/tmp
+
 .DS_Store
 *.suo
 *.ntvs*

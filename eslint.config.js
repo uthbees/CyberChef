@@ -20,6 +20,7 @@ export default tseslint.config({
             'warn',
             {
                 ignoreRestSiblings: true,
+                caughtErrors: 'none',
             },
         ],
         'react-refresh/only-export-components': [

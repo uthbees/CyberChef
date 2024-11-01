@@ -1,7 +1,11 @@
 import './styles/index.css';
 import AppRouter from './AppRouter';
+import SelectedRecipesContextProvider from './SelectedRecipesContextProvider';
 
 export default function App() {
-    // Here will live global contexts, data fetching, etc.
-    return <AppRouter />;
+    return (
+        <SelectedRecipesContextProvider>
+            <AppRouter />
+        </SelectedRecipesContextProvider>
+    );
 }
