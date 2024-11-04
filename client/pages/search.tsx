@@ -1,22 +1,32 @@
-import { useState } from 'react';
-import CyberChefLogo from '../assets/images/logo/logo_white.png';
+// This page is being developed by Andy.
+
+// import { useState } from 'react';
+// import CyberChefLogo from '../assets/images/logo/logo_white.png';
 // import viteLogo from '/vite.svg';
 import './Search.css';
 
-export default function SearchPage() {
+interface SearchPageProps {
+    recipes: SearchResultProps[];
+}
+
+export default function SearchPage(p: SearchPageProps) {
     return (
         <main>
-            {SearchIntro()}
-            {SearchForm()}
-            {SearchResults()}
+            <IntroHeader pageName="Search" />
+            <SearchForm />
+            <SearchResults recipes={p.recipes} />
         </main>
     );
 }
 
-function SearchIntro() {
+interface IntroHeaderProps {
+    pageName: string;
+}
+
+function IntroHeader(p: IntroHeaderProps) {
     return (
-        <div className="page-title">
-            <h1>Search</h1>
+        <div className="intro-header">
+            <h1>{p.pageName}</h1>
         </div>
     );
 }
@@ -29,10 +39,10 @@ function SearchForm() {
                 action="/my-handling-form-page"
                 method="post"
             >
-                {SearchBar()}
-                {Filters()}
+                <SearchBar />
+                <Filters />
             </form>
-            {ActiveFilters()}
+            <ActiveFilters />
         </div>
     );
 }
@@ -54,7 +64,7 @@ function SearchBar() {
 
 function Filters() {
     return (
-        <div>
+        <>
             <p>Filter by:</p>
             {/* <label for="tags-filter">Filter by:</label> */}
             <select
@@ -71,18 +81,18 @@ function Filters() {
             </select>
             <select name="filter-options" id="filter-options"></select>
             <button onClick={updateSearch}>Apply</button>
-        </div>
+        </>
     );
 }
 
 function ActiveFilters() {
     return (
-        <div>
+        <>
             <div>Active Filters:</div>
             <div>
-                /* TODO: get & display active filters; allow user to remove */
+                {/* TODO: get & display active filters; allow user to remove */}
             </div>
-        </div>
+        </>
     );
 }
 
@@ -115,10 +125,39 @@ function updateFilterChoice() {
     // });
 }
 
-function SearchResults() {
-    return <div className="search-results">/* TODO: Search results */</div>;
+function SearchResults(p: SearchPageProps) {
+    length = p.recipes.length;
+    if (length === 0) {
+        return <div className="search-results">No results found</div>;
+    }
+    // let newRecipes: string = "";
+    // recipes.forEach((recipe) => {newRecipes += SearchResult(recipe)});
+    return (
+        <div className="search-results">
+            <ul>
+                {p.recipes.map((recipe, i) => (
+                    <li key={i}>{SearchResult(recipe)}</li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
-function SearchResult() {
-    return <div>/* TODO: Search result */</div>;
+interface SearchResultProps {
+    recipeName: string;
+    imgFile: string;
+    difficulty: string;
+    totalTime: string;
+}
+
+function SearchResult(p: SearchResultProps) {
+    return (
+        <div className="search-result">
+            <img src={p.imgFile} alt={'Image of ' + p.recipeName} />
+            <h2>{p.recipeName}</h2>
+            <p>
+                Difficulty: {p.difficulty} | Total time: {p.totalTime}
+            </p>
+        </div>
+    );
 }
