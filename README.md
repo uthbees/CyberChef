@@ -4,7 +4,7 @@ Install node: https://nodejs.org/en/download/package-manager
 
 Run `npm install` to install the project dependencies.
 
-Copy the `database.db` file in the `server` directory into the `server/tmp` directory.
+Copy the `recipes.db` file in the `server` directory into the `server/tmp` directory.
 
 Run `npm run client` to run the client application.
 
