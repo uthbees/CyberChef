@@ -1,56 +1,23 @@
 import { useContext } from 'react';
 import { SelectedRecipesContext } from '../SelectedRecipesContextProvider';
 import {
-    Button,
     Checkbox,
     FormControlLabel,
     FormGroup,
     IconButton,
     Typography,
 } from '@mui/material';
-import { Recipe, RecipeDifficulty } from '../types';
+import { Recipe } from '../types';
 import { Close } from '@mui/icons-material';
 
 export default function ShoppingList() {
-    const { selectedRecipes, setSelectedRecipes } = useContext(
-        SelectedRecipesContext,
-    );
+    const { selectedRecipes } = useContext(SelectedRecipesContext);
 
     return (
-        <div>
-            <div style={{ padding: 16 }}>
-                {selectedRecipes.map((recipe) => (
-                    <RecipeDisplay key={recipe.uuid} recipe={recipe} />
-                ))}
-            </div>
-            <Button
-                onClick={() =>
-                    setSelectedRecipes((prevState) => [
-                        ...prevState,
-                        {
-                            // Just put something unique in there for now since it's not going into the database
-                            uuid: Math.random().toString(36),
-                            name: 'test name',
-                            description: 'test description',
-                            difficulty: RecipeDifficulty.EASY,
-                            prepTimeMin: 10,
-                            cookTimeMin: 10,
-                            ingredients: [
-                                { name: 'test ingredient', quantity: 3 },
-                                {
-                                    name: 'test ingredient 2',
-                                    quantity: 6,
-                                    unit: 'kilometer',
-                                },
-                            ],
-                            instructions: [],
-                            note: '',
-                        },
-                    ])
-                }
-            >
-                Add new recipe
-            </Button>
+        <div style={{ padding: 16 }}>
+            {selectedRecipes.map((recipe) => (
+                <RecipeDisplay key={recipe.uuid} recipe={recipe} />
+            ))}
         </div>
     );
 }
