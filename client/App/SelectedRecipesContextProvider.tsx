@@ -58,9 +58,36 @@ export default function SelectedRecipesContextProvider({
                 });
             }
 
+            function setIngredientCheckedStatus(
+                recipeUuid: string,
+                ingredientIndex: number,
+                newStatus: boolean,
+            ) {
+                updateSelectedRecipes((prevState) => {
+                    const newSelectedRecipes = structuredClone(prevState);
+
+                    const updatedRecipeIndex = prevState.findIndex(
+                        (recipe) => recipe.uuid === recipeUuid,
+                    );
+                    if (updatedRecipeIndex === -1) {
+                        alert(
+                            `Error: Failed to find recipe with uuid ${recipeUuid}.`,
+                        );
+                        return prevState;
+                    }
+
+                    newSelectedRecipes[updatedRecipeIndex].ingredients[
+                        ingredientIndex
+                    ].uiChecked = newStatus;
+
+                    return newSelectedRecipes;
+                });
+            }
+
             return {
                 selectedRecipes,
                 setSelectedRecipes: updateSelectedRecipes,
+                setIngredientCheckedStatus,
             };
         }, [selectedRecipes]);
 
@@ -74,10 +101,16 @@ export default function SelectedRecipesContextProvider({
 interface SelectedRecipesContextValue {
     selectedRecipes: Recipe[];
     setSelectedRecipes: Dispatch<SetStateAction<Recipe[]>>;
+    setIngredientCheckedStatus: (
+        recipeUuid: string,
+        ingredientIndex: number,
+        newStatus: boolean,
+    ) => void;
 }
 
 export const SelectedRecipesContext =
     createContext<SelectedRecipesContextValue>({
         selectedRecipes: [],
         setSelectedRecipes: () => null,
+        setIngredientCheckedStatus: () => null,
     });
