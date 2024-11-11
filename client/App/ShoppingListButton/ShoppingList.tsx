@@ -23,7 +23,7 @@ export default function ShoppingList() {
 }
 
 function RecipeDisplay({ recipe }: { recipe: Recipe }) {
-    const { setIngredientCheckedStatus, setSelectedRecipes } = useContext(
+    const { setIngredientCheckedStatus, setSelectedRecipeUuids } = useContext(
         SelectedRecipesContext,
     );
 
@@ -64,11 +64,8 @@ function RecipeDisplay({ recipe }: { recipe: Recipe }) {
                 />
                 <IconButton
                     onClick={() =>
-                        setSelectedRecipes((prevState) =>
-                            prevState.filter(
-                                (stateRecipe) =>
-                                    stateRecipe.uuid !== recipe.uuid,
-                            ),
+                        setSelectedRecipeUuids((prevState) =>
+                            prevState.filter((uuid) => uuid !== recipe.uuid),
                         )
                     }
                 >

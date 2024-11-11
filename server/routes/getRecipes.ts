@@ -7,7 +7,8 @@ const getRecipes: RequestHandler = async (req, res) => {
         const rows = await db.all(
             'SELECT * FROM recipes, ingredients, instructions, recipes_has_ingredients',
         );
-        // console.log('Recipes loaded successfully');
+        console.log('Recipes loaded successfully');
+        console.log(rows);
         // rows = await db.all('SELECT * FROM ingredients');
         // rows += db.all('SELECT * FROM instructions');
         // rows += db.all('SELECT * FROM recipes_has_ingredients');

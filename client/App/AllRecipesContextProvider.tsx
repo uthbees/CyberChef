@@ -8,7 +8,7 @@ export default function AllRecipesContextProvider({
 }: {
     children: ReactNode;
 }) {
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [recipes, setRecipes] = useState<Record<string, Recipe>>({});
 
     useInitialSetup(() => {
         const genericFailMessage =
@@ -32,7 +32,13 @@ export default function AllRecipesContextProvider({
                     return;
                 }
 
-                setRecipes(decoded);
+                const recipesObject: Record<string, Recipe> = {};
+
+                decoded.forEach((recipe: Recipe) => {
+                    recipesObject[recipe.uuid] = recipe;
+                });
+
+                setRecipes(recipesObject);
             },
             (reason) => {
                 alert(genericFailMessage);
@@ -55,9 +61,9 @@ export default function AllRecipesContextProvider({
 }
 
 interface AllRecipesContextValue {
-    recipes: Recipe[];
+    recipes: Record<string, Recipe>;
 }
 
 export const AllRecipesContext = createContext<AllRecipesContextValue>({
-    recipes: [],
+    recipes: {},
 });

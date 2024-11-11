@@ -3,46 +3,54 @@ import {
     Dispatch,
     ReactNode,
     SetStateAction,
+    useContext,
     useMemo,
     useState,
 } from 'react';
 import { Recipe } from './types';
 import useInitialSetup from '../utils/useInitialSetup';
+import { AllRecipesContext } from './AllRecipesContextProvider';
+
+const LOCALSTORAGE_KEY = 'selectedRecipes';
 
 export default function SelectedRecipesContextProvider({
     children,
 }: {
     children: ReactNode;
 }) {
-    const [selectedRecipes, setSelectedRecipes] = useState<Recipe[]>([]);
+    const { recipes } = useContext(AllRecipesContext);
+
+    const [savedSelectedRecipes, setSavedSelectedRecipes] = useState<
+        SavedSelectedRecipe[]
+    >([]);
 
     useInitialSetup(() => {
-        const rawSavedSelectedRecipes = localStorage.getItem('selectedRecipes');
+        const rawSavedSelectedRecipes = localStorage.getItem(LOCALSTORAGE_KEY);
 
         if (rawSavedSelectedRecipes === null) {
             return;
         }
 
-        let parsedSavedSelectedRecipes: Recipe[];
+        let parsedSavedSelectedRecipes: SavedSelectedRecipe[];
         try {
             parsedSavedSelectedRecipes = JSON.parse(
                 rawSavedSelectedRecipes,
-            ) as unknown as Recipe[];
+            ) as unknown as SavedSelectedRecipe[];
         } catch (e) {
             alert('Error: Failed to parse saved selected recipes.');
             return;
         }
 
-        setSelectedRecipes(parsedSavedSelectedRecipes);
+        setSavedSelectedRecipes(parsedSavedSelectedRecipes);
     });
 
     const selectedRecipesContextValue: SelectedRecipesContextValue =
         useMemo(() => {
-            function updateSelectedRecipes(
-                setStateAction: SetStateAction<Recipe[]>,
+            function handleUpdateSelectedRecipes(
+                setStateAction: SetStateAction<SavedSelectedRecipe[]>,
             ) {
-                setSelectedRecipes((prevState) => {
-                    let newSelectedRecipes: Recipe[];
+                setSavedSelectedRecipes((prevState) => {
+                    let newSelectedRecipes: SavedSelectedRecipe[];
                     if (typeof setStateAction === 'function') {
                         newSelectedRecipes = setStateAction(prevState);
                     } else {
@@ -50,9 +58,45 @@ export default function SelectedRecipesContextProvider({
                     }
 
                     localStorage.setItem(
-                        'selectedRecipes',
+                        LOCALSTORAGE_KEY,
                         JSON.stringify(newSelectedRecipes),
                     );
+
+                    return newSelectedRecipes;
+                });
+            }
+
+            function setSelectedRecipeUuids(
+                setStateAction: SetStateAction<string[]>,
+            ) {
+                handleUpdateSelectedRecipes((prevState) => {
+                    let newUuids: string[];
+                    if (typeof setStateAction === 'function') {
+                        newUuids = setStateAction(
+                            prevState.map((recipe) => recipe.uuid),
+                        );
+                    } else {
+                        newUuids = setStateAction;
+                    }
+
+                    const newSelectedRecipes: SavedSelectedRecipe[] =
+                        newUuids.map((uuid) => ({
+                            uuid,
+                            ingredientCheckedStatuses: [],
+                        }));
+                    prevState.forEach((prevSelectedRecipe) => {
+                        const recipeIndex = newSelectedRecipes.findIndex(
+                            (newSelectedRecipe) =>
+                                newSelectedRecipe.uuid ==
+                                prevSelectedRecipe.uuid,
+                        );
+                        if (recipeIndex !== -1) {
+                            newSelectedRecipes[
+                                recipeIndex
+                            ].ingredientCheckedStatuses =
+                                prevSelectedRecipe.ingredientCheckedStatuses;
+                        }
+                    });
 
                     return newSelectedRecipes;
                 });
@@ -63,7 +107,7 @@ export default function SelectedRecipesContextProvider({
                 ingredientIndex: number,
                 newStatus: boolean,
             ) {
-                updateSelectedRecipes((prevState) => {
+                handleUpdateSelectedRecipes((prevState) => {
                     const newSelectedRecipes = structuredClone(prevState);
 
                     const updatedRecipeIndex = prevState.findIndex(
@@ -76,20 +120,25 @@ export default function SelectedRecipesContextProvider({
                         return prevState;
                     }
 
-                    newSelectedRecipes[updatedRecipeIndex].ingredients[
-                        ingredientIndex
-                    ].uiChecked = newStatus;
+                    newSelectedRecipes[
+                        updatedRecipeIndex
+                    ].ingredientCheckedStatuses[ingredientIndex] = newStatus;
 
                     return newSelectedRecipes;
                 });
             }
 
             return {
-                selectedRecipes,
-                setSelectedRecipes: updateSelectedRecipes,
+                selectedRecipes: savedSelectedRecipes
+                    .map(
+                        (savedSelectedRecipe) =>
+                            recipes[savedSelectedRecipe.uuid],
+                    )
+                    .filter((recipe) => recipe !== undefined),
+                setSelectedRecipeUuids,
                 setIngredientCheckedStatus,
             };
-        }, [selectedRecipes]);
+        }, [recipes, savedSelectedRecipes]);
 
     return (
         <SelectedRecipesContext.Provider value={selectedRecipesContextValue}>
@@ -100,7 +149,7 @@ export default function SelectedRecipesContextProvider({
 
 interface SelectedRecipesContextValue {
     selectedRecipes: Recipe[];
-    setSelectedRecipes: Dispatch<SetStateAction<Recipe[]>>;
+    setSelectedRecipeUuids: Dispatch<SetStateAction<string[]>>;
     setIngredientCheckedStatus: (
         recipeUuid: string,
         ingredientIndex: number,
@@ -111,6 +160,11 @@ interface SelectedRecipesContextValue {
 export const SelectedRecipesContext =
     createContext<SelectedRecipesContextValue>({
         selectedRecipes: [],
-        setSelectedRecipes: () => null,
+        setSelectedRecipeUuids: () => null,
         setIngredientCheckedStatus: () => null,
     });
+
+interface SavedSelectedRecipe {
+    uuid: string;
+    ingredientCheckedStatuses: boolean[];
+}
