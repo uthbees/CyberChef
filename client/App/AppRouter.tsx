@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AppFrame from './AppFrame';
 import RecipeSearchPage from '../pages/RecipeSearchPage';
 import RecipeCreationPage from '../pages/RecipeCreationPage';
-import ReactDemoPage from '../pages/ReactDemoPage';
+import HomePage from '../pages/HomePage';
 
 export default function AppRouter() {
     return <RouterProvider router={router} />;
@@ -15,7 +15,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <ReactDemoPage />,
+                element: <HomePage />,
             },
             {
                 path: '/recipes',
