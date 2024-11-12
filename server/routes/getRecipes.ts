@@ -5,18 +5,16 @@ const getRecipes: RequestHandler = async (req, res) => {
     try {
         const db = await openDb();
         const rows = await db.all(
-            'SELECT * FROM recipes, ingredients, instructions, recipes_has_ingredients',
+            'SELECT' +
+                ' name, uuid, description, difficulty,' +
+                ' prep_time_min AS prep_time, cook_time_min AS cook_time, notes' +
+                ' FROM recipes',
         );
-        console.log('Recipes loaded successfully');
-        console.log(rows);
-        // rows = await db.all('SELECT * FROM ingredients');
-        // rows += db.all('SELECT * FROM instructions');
-        // rows += db.all('SELECT * FROM recipes_has_ingredients');
-        res.status(200);
-        res.json(rows);
+        console.log('Recipes loaded successfully', rows);
+        res.status(200).json(rows);
     } catch (err) {
         console.error('Error loading recipes', err);
-        res.status(500);
+        res.status(500).send();
     }
 };
 
