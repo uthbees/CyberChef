@@ -14,7 +14,12 @@ import {
     FormControl,
     InputLabel,
     Box,
+    IconButton,
+    TextField,
 } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { Recipe } from '../App/types';
@@ -62,11 +67,11 @@ RecipeSearchPage
 */
 
 export default function RecipeSearchPage() {
-    const { selectedRecipes, setSelectedRecipeUuids } = useContext(
-        SelectedRecipesContext,
-    );
+    // const { selectedRecipes, setSelectedRecipeUuids } = useContext(
+    //     SelectedRecipesContext,
+    // );
 
-    const { recipes } = useContext(AllRecipesContext);
+    // const { recipes } = useContext(AllRecipesContext);
 
     const AFState = useState<AppliedFilters>({});
     const FRState = useState<Recipe[]>([]);
@@ -104,7 +109,7 @@ function SearchDiv() {
             sx={{
                 p: 2,
                 bgcolor: '#eee',
-                border: '5px solid #fc7409',
+                border: '5px solid #201C1C',
                 borderRadius: 4,
                 margin: 'auto',
             }}
@@ -132,7 +137,13 @@ function SearchBar() {
         <Grid2 container spacing={4} size={6}>
             <SearchInput />
             <Grid2 size={4}>
-                <Button id="search-button">Search</Button>
+                <Button
+                    endIcon={<SearchIcon />}
+                    variant="contained"
+                    id="search-button"
+                >
+                    Search
+                </Button>
             </Grid2>
         </Grid2>
     );
@@ -140,7 +151,9 @@ function SearchBar() {
 
 function SearchInput() {
     const [searchQuery, setSearchQuery] = useState('');
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    ) => {
         setSearchQuery(e.target.value);
     };
     const handleClick = () => {
@@ -148,8 +161,9 @@ function SearchInput() {
     };
     return (
         <Grid2 size={8}>
-            <input
-                type="text"
+            <TextField
+                label="Search for recipes..."
+                variant="outlined"
                 name="search-input"
                 id="search-input"
                 value={searchQuery}
@@ -161,10 +175,11 @@ function SearchInput() {
 }
 
 function ClearXButton({ onClick }: { onClick: () => void }) {
+    //variant="text" id="clear-x-button"
     return (
-        <Button id="clear-x-button" onClick={onClick}>
-            X
-        </Button>
+        <IconButton onClick={onClick} size="small">
+            <ClearIcon />
+        </IconButton>
     );
 }
 
@@ -175,9 +190,9 @@ function Filters() {
             value: 'tags',
             onlyOneFilterAtATime: false,
             criteria: [
-                { name: 'tag1', value: 'tag1' },
-                { name: 'tag2', value: 'tag2' },
-                { name: 'tag3', value: 'tag3' },
+                { name: 'Tag1', value: 'tag1' },
+                { name: 'Tag2', value: 'tag2' },
+                { name: 'Tag3', value: 'tag3' },
             ],
         },
         diff: {
@@ -185,9 +200,9 @@ function Filters() {
             value: 'diff',
             onlyOneFilterAtATime: true,
             criteria: [
-                { name: 'easy', value: 'easy' },
-                { name: 'intermediate', value: 'medi' },
-                { name: 'expert', value: 'hard' },
+                { name: 'Easy', value: 'easy' },
+                { name: 'Intermediate', value: 'medi' },
+                { name: 'Expert', value: 'hard' },
             ],
         },
         rate: {
@@ -262,7 +277,13 @@ function Filters() {
                 setSelectedCriterion={setSelectedCriterion}
             />
             <Grid2 size={4}>
-                <Button onClick={applyFilter}>Apply Filter</Button>
+                <Button
+                    variant="contained"
+                    onClick={applyFilter}
+                    endIcon={<FilterAltIcon />}
+                >
+                    Apply Filter
+                </Button>
             </Grid2>
         </Grid2>
     );
@@ -349,7 +370,7 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
 
 function FiltersStrip() {
     return (
-        <Box sx={{ maxWidth: 200 }}>
+        <Box sx={{ maxWidth: 'auto' }}>
             <Grid2 container spacing={4}>
                 <ActiveFiltersWrapper />
                 <SortByDropdown />
@@ -372,14 +393,14 @@ function ActiveFiltersWrapper() {
 
     if (Object.keys(appliedFilters).length === 0) {
         return (
-            <Grid2>
+            <Grid2 size={10}>
                 <p>No Active Filters</p>
             </Grid2>
         );
     }
 
     return (
-        <Grid2 container spacing={4} size={8}>
+        <Grid2 container spacing={4} size={10}>
             <Grid2 size={2}>
                 <p>Active Filters:</p>
             </Grid2>
@@ -403,24 +424,44 @@ function AppliedFilterFlier(p: AppliedFilterFlierProps) {
         p.removeFilter(p.filter);
     };
     return (
-        <div>
-            <p>
-                {yuh.filter.name}: {yuh.criterion.name}
-            </p>
-            <ClearXButton onClick={handleClick} />
-        </div>
+        <Grid2 container spacing={0}>
+            <Grid2 sx={{ margin: 'auto' }}>
+                <p>
+                    {yuh.filter.name}: {yuh.criterion.name}
+                </p>
+            </Grid2>
+            <Grid2 sx={{ margin: 'auto' }}>
+                <ClearXButton onClick={handleClick} />
+            </Grid2>
+        </Grid2>
     );
 }
 
 function SortByDropdown() {
+    const [thisValue, setThisValue] = useState('');
+    const handleChange = (event: SelectChangeEvent) => {
+        setThisValue(event.target.value);
+    };
+    const thisName = 'Sort by...';
+
     return (
-        <select id="sort-by-dropdown">
-            <option selected>Sort by...</option>
-            <option>Alphabetical</option>
-            <option>Difficulty</option>
-            <option>Rating</option>
-            <option>Time</option>
-        </select>
+        <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
+            <FormControl fullWidth>
+                <InputLabel>{thisName}</InputLabel>
+                <Select
+                    id="criteria-dropdown"
+                    value={thisValue}
+                    onChange={handleChange}
+                    label={thisName}
+                >
+                    <MenuItem selected>Sort by...</MenuItem>
+                    <MenuItem>Alphabetical</MenuItem>
+                    <MenuItem>Difficulty</MenuItem>
+                    <MenuItem>Rating</MenuItem>
+                    <MenuItem>Time</MenuItem>
+                </Select>
+            </FormControl>
+        </Box>
     );
 }
 
