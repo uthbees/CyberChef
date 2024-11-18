@@ -25,9 +25,6 @@ interface RecipeDetails {
     quantity: number;
     unit: string;
     text: string;
-    // recipes: Recipe[];
-    // ingredients: Ingredient[];
-    // instructions: Instructions[];
 }
 
 interface Ingredient {
