@@ -1,4 +1,5 @@
 export interface Recipe {
+    uuid: string;
     name: string;
     description: string;
     difficulty: RecipeDifficulty;
@@ -12,7 +13,9 @@ export interface Recipe {
 export interface Ingredient {
     name: string;
     quantity: number;
-    unit: string;
+    unit?: string;
+    // Whether the checkbox in the UI is checked.
+    uiChecked?: boolean;
 }
 
 export enum RecipeDifficulty {

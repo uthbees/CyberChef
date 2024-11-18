@@ -17,14 +17,19 @@
         "@emotion/styled": "^11.13.0",
         "@mui/icons-material": "^6.1.5",
         "@mui/material": "^6.1.5",
+        "arktype": "^2.0.0-rc.23",
+        "body-parser": "^1.20.3",
+        "cors": "^2.8.5",
         "express": "^4.21.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-router-dom": "^6.27.0",
         "sqlite": "^5.1.1",
-        "sqlite3": "^5.1.7"
+        "sqlite3": "^5.1.7",
+        "uuid": "^11.0.3"
     },
     "devDependencies": {
+        "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
         "@types/react": "^18.3.3",
         "@types/react-dom": "^18.3.0",

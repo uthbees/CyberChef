@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="styles/styles.css" />
+        <script src="scripts/search-script.js" defer></script>
+        <title>Search Recipes</title>
+    </head>
+    <body>
+        <header>
+            <a id="logo-link" href="index.html"
+                ><img class="logo" src="images/logo/nobg.png" alt="logo" />
+            </a>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="favorites.html">Favorites</a>
+                <a href="search.html">Search</a>
+                <a href="upload.html">Upload</a>
+            </nav>
+        </header>
+        <main>
+            <h1>Recipe Search</h1>
+            <div id="search-element">
+                <div id="search-bar">
+                    <form
+                        id="search-form"
+                        action="/my-handling-form-page"
+                        method="post"
+                    >
+                        <div>
+                            <br />
+                            <input
+                                type="text"
+                                name="search-input"
+                                id="search-input"
+                            />
+                            <input
+                                type="button"
+                                id="search-button"
+                                onclick="updateSearch()"
+                                value="Search"
+                            />
+                            <input type="reset" id="reset-button" />
+                            <br />
+                            <p>Filter by:</p>
+                            <label for="tags-filter">Tags:</label>
+                            <select
+                                name="tags-filter"
+                                id="tags-filter"
+                                onchange="updateSearch()"
+                            >
+                                <option value="#all#">All</option>
+                                <option value="dessert">dessert</option>
+                                <option value="salad">salad</option>
+                                <option value="beverage">beverage</option>
+                                <option value="mexican">mexican</option>
+                            </select>
+                            <label for="time-filter">Total Time: ≤</label>
+                            <select
+                                name="time-filter"
+                                id="time-filter"
+                                onchange="updateSearch()"
+                            >
+                                <option value="1000">All</option>
+                                <option value="5">5 mins</option>
+                                <option value="15">15 mins</option>
+                                <option value="30">30 mins</option>
+                                <option value="60">1 hr</option>
+                            </select>
+                            <!-- <br /> -->
+                        </div>
+                    </form>
+                </div>
+                <div id="search-results">
+                    <div class="search-result">
+                        <img src="images/logo/main.png" alt="thumbnail" />
+                        <p>Recipe Name</p>
+                        <p>Tags: tag1, tag2, ...</p>
+                        <p>Prep Time: int<br />Cook Time: int</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div id="myModal" class="modal">
+            <span id="close">&times;</span>
+            <div id="modal-content"></div>
+        </div>
+        <footer>
+            <img class="logo" src="images/logo/main.png" alt="logo" />
+            <h3>&copy;2023 Andrew Allen</h3>
+            <nav>
+                <a href="about.html">About Us</a>
+                <a href="contact-us.html">Contact Us</a>
+                <a href="resources/site-plan.html">Site Plan</a>
+            </nav>
+            <div id="social-links">
+                <a href="https://www.facebook.com/allenjandrew" target="_blank"
+                    ><img
+                        class="social"
+                        src="images/social/facebook.png"
+                        alt="Facebook"
+                /></a>
+                <a href="https://www.twitter.com/andy_allen_2" target="_blank"
+                    ><img
+                        class="social"
+                        src="images/social/twitter.png"
+                        alt="Twitter"
+                /></a>
+                <a href="https://www.instagram.com/allenjandrew" target="_blank"
+                    ><img
+                        class="social"
+                        src="images/social/instagram.png"
+                        alt="Instagram"
+                /></a>
+            </div>
+        </footer>
+    </body>
+</html>

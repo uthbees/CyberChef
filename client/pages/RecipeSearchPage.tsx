@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { Button } from '@mui/material';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
+import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { Recipe } from '../App/types';
 
 /* Structure:
@@ -51,6 +52,14 @@ RecipeSearchPage
 ----- COMPONENT DEFINITIONS -----
 */
 
+function Fixer() {
+    const { recipes } = useContext(AllRecipesContext);
+
+    return Object.values(recipes).map((r, index) => (
+        <p key={index}>{r.name}</p>
+    ));
+}
+
 export default function RecipeSearchPage() {
     // const { selectedRecipes, setSelectedRecipes } = useContext(
     //     SelectedRecipesContext,
@@ -69,6 +78,7 @@ export default function RecipeSearchPage() {
                 <SearchDiv />
                 <SearchResults />
                 {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
+                <Fixer />
             </AppliedFiltersContext.Provider>
         </div>
     );
