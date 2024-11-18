@@ -5,7 +5,16 @@ import {
     useContext,
     useState,
 } from 'react';
-import { Button } from '@mui/material';
+import {
+    Button,
+    Grid2,
+    Select,
+    SelectChangeEvent,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Box,
+} from '@mui/material';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { Recipe } from '../App/types';
@@ -52,23 +61,20 @@ RecipeSearchPage
 ----- COMPONENT DEFINITIONS -----
 */
 
-function Fixer() {
+export default function RecipeSearchPage() {
+    const { selectedRecipes, setSelectedRecipeUuids } = useContext(
+        SelectedRecipesContext,
+    );
+
     const { recipes } = useContext(AllRecipesContext);
 
-    return Object.values(recipes).map((r, index) => (
-        <p key={index}>{r.name}</p>
-    ));
-}
-
-export default function RecipeSearchPage() {
-    // const { selectedRecipes, setSelectedRecipes } = useContext(
-    //     SelectedRecipesContext,
-    // );
-
     const AFState = useState<AppliedFilters>({});
+    const FRState = useState<Recipe[]>([]);
     const AFValue: AppliedFiltersContextValue = {
         appliedFilters: AFState[0],
         setAppliedFilters: AFState[1],
+        filteredRecipes: FRState[0],
+        setFilteredRecipes: FRState[1],
     };
 
     return (
@@ -78,7 +84,6 @@ export default function RecipeSearchPage() {
                 <SearchDiv />
                 <SearchResults />
                 {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
-                <Fixer />
             </AppliedFiltersContext.Provider>
         </div>
     );
@@ -95,28 +100,41 @@ function IntroHeader() {
 
 function SearchDiv() {
     return (
-        <div>
+        <Box
+            sx={{
+                p: 2,
+                bgcolor: '#eee',
+                border: '5px solid #fc7409',
+                borderRadius: 4,
+                margin: 'auto',
+            }}
+            maxWidth={1000}
+        >
             <SearchForm />
             <FiltersStrip />
-        </div>
+        </Box>
     );
 }
 
 function SearchForm() {
     return (
         <form id="search-form" action="/my-handling-form-page" method="post">
-            <SearchBar />
-            <Filters />
+            <Grid2 container spacing={4}>
+                <SearchBar />
+                <Filters />
+            </Grid2>
         </form>
     );
 }
 
 function SearchBar() {
     return (
-        <div>
+        <Grid2 container spacing={4} size={6}>
             <SearchInput />
-            <Button id="search-button">Search</Button>
-        </div>
+            <Grid2 size={4}>
+                <Button id="search-button">Search</Button>
+            </Grid2>
+        </Grid2>
     );
 }
 
@@ -129,7 +147,7 @@ function SearchInput() {
         setSearchQuery('');
     };
     return (
-        <div>
+        <Grid2 size={8}>
             <input
                 type="text"
                 name="search-input"
@@ -138,7 +156,7 @@ function SearchInput() {
                 onChange={(e) => handleChange(e)}
             />
             <ClearXButton onClick={handleClick} />
-        </div>
+        </Grid2>
     );
 }
 
@@ -232,7 +250,7 @@ function Filters() {
     };
 
     return (
-        <div>
+        <Grid2 container spacing={4} size={6}>
             <FilterByDropdown
                 filters={filters}
                 selectedFilter={selectedFilter}
@@ -243,74 +261,100 @@ function Filters() {
                 selectedCriterion={selectedCriterion}
                 setSelectedCriterion={setSelectedCriterion}
             />
-            <Button onClick={applyFilter}>Apply Filter</Button>
-        </div>
+            <Grid2 size={4}>
+                <Button onClick={applyFilter}>Apply Filter</Button>
+            </Grid2>
+        </Grid2>
     );
 }
 
 function FilterByDropdown(p: FilterByDropdownProps) {
-    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const [thisValue, setThisValue] = useState('');
+    const handleChange = (event: SelectChangeEvent) => {
         p.setSelectedFilter(event.target.value);
+        setThisValue(event.target.value);
     };
+    const thisName = 'Filter by...';
 
     return (
-        <select
-            id="filter-by-dropdown"
-            value={p.selectedFilter}
-            onChange={handleChange}
-        >
-            <option selected key="none" value="none">
-                Filter by...
-            </option>
-
-            {Object.keys(p.filters).map(
-                (filter) =>
-                    filter != 'none' && (
-                        <option
-                            key={p.filters[filter].value}
-                            value={p.filters[filter].value}
-                        >
-                            {p.filters[filter].name}
-                        </option>
-                    ),
-            )}
-        </select>
+        <Grid2 size={4}>
+            <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
+                <FormControl fullWidth>
+                    <InputLabel>{thisName}</InputLabel>
+                    <Select
+                        id="filter-by-dropdown"
+                        value={thisValue}
+                        onChange={handleChange}
+                        label={thisName}
+                    >
+                        {/* <option selected key="none" value="none">
+                                Filter by...
+                            </option> */}
+                        {Object.keys(p.filters).map(
+                            (filter) =>
+                                filter != 'none' && (
+                                    <MenuItem
+                                        key={p.filters[filter].value}
+                                        value={p.filters[filter].value}
+                                    >
+                                        {p.filters[filter].name}
+                                    </MenuItem>
+                                ),
+                        )}
+                    </Select>
+                </FormControl>
+            </Box>
+        </Grid2>
     );
 }
 
 function CriteriaDropdown(p: CriteriaDropdownProps) {
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [thisValue, setThisValue] = useState('');
+    const handleChange = (e: SelectChangeEvent) => {
         p.setSelectedCriterion(e.target.value);
+        setThisValue(e.target.value);
     };
 
     const availableOptions = p.activeFilter
         ? p.activeFilter.criteria
         : [{ name: 'Choose a filter first!', value: 'nyet' }];
 
+    const thisName = 'Criteria...';
+
     return (
-        <select
-            id="criteria-dropdown"
-            value={p.selectedCriterion}
-            onChange={handleChange}
-        >
-            <option key="none" value="none">
-                Select criteria...
-            </option>
-            {availableOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {option.name}
-                </option>
-            ))}
-        </select>
+        <Grid2 size={4}>
+            <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
+                <FormControl fullWidth>
+                    <InputLabel>{thisName}</InputLabel>
+                    <Select
+                        id="criteria-dropdown"
+                        value={thisValue}
+                        onChange={handleChange}
+                        label={thisName}
+                    >
+                        {/* <option key="none" value="none">
+                                Select criteria...
+                            </option> */}
+                        {availableOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+        </Grid2>
     );
 }
 
 function FiltersStrip() {
     return (
-        <div>
-            <ActiveFiltersWrapper />
-            <SortByDropdown />
-        </div>
+        <Box sx={{ maxWidth: 200 }}>
+            <Grid2 container spacing={4}>
+                <ActiveFiltersWrapper />
+                <SortByDropdown />
+            </Grid2>
+        </Box>
     );
 }
 
@@ -327,13 +371,19 @@ function ActiveFiltersWrapper() {
     };
 
     if (Object.keys(appliedFilters).length === 0) {
-        return <p>No Active Filters</p>;
+        return (
+            <Grid2>
+                <p>No Active Filters</p>
+            </Grid2>
+        );
     }
 
     return (
-        <div>
-            <p>Active Filters:</p>
-            <div>
+        <Grid2 container spacing={4} size={8}>
+            <Grid2 size={2}>
+                <p>Active Filters:</p>
+            </Grid2>
+            <Grid2 container size={10}>
                 {Object.keys(appliedFilters).map((filter) => (
                     <AppliedFilterFlier
                         key={appliedFilters[filter].filter.value}
@@ -342,8 +392,8 @@ function ActiveFiltersWrapper() {
                         removeFilter={removeFilter}
                     />
                 ))}
-            </div>
-        </div>
+            </Grid2>
+        </Grid2>
     );
 }
 
@@ -376,25 +426,70 @@ function SortByDropdown() {
 
 function SearchResults() {
     const {
-        selectedRecipes, //setSelectedRecipes
-    } = useContext(SelectedRecipesContext);
+        recipes, //setSelectedRecipes
+    } = useContext(AllRecipesContext);
 
     return (
-        <div>
-            {selectedRecipes.map((recipe) => (
-                <RecipeCard key={recipe.name} recipe={recipe} />
+        <Grid2 container spacing={4}>
+            {Object.values(recipes).map((r, index) => (
+                <RecipeCard key={index} index={index} recipe={r} />
             ))}
-        </div>
+        </Grid2>
     );
 }
 
-function RecipeCard(p: { recipe: Recipe }) {
+function RecipeCard(p: { recipe: Recipe; index: number }) {
+    // let tags: string = p.recipe.tags.join(', ');
+    // tags = tags.charAt(0).toUpperCase() + tags.slice(1).toLowerCase();
+    // const tagCutOff = 18;
+    // if (tags.length > tagCutOff) {
+    //     tags = tags.substring(0, tagCutOff - 3) + '...';
+    // }
+
     return (
-        <div>
-            <img src="https://placehold.co/200" />
+        <Grid2 key={p.index} size={4}>
+            {/* <img src="https://placehold.co/200" /> */}
             <h2>{p.recipe.name}</h2>
-            {/* <AddToShoppingListButton /> */}
-        </div>
+            <p>Difficulty: {p.recipe.difficulty}</p>
+            <p>Total time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
+            {/* <p>Tags: {tags}</p> */}
+            <AddToShoppingListButton recipe={p.recipe} />
+        </Grid2>
+    );
+}
+
+function AddToShoppingListButton(p: { recipe: Recipe }) {
+    const { selectedRecipes, setSelectedRecipeUuids } = useContext(
+        SelectedRecipesContext,
+    );
+
+    const handleClick = (recipe: Recipe) => {
+        const mapped = selectedRecipes.map((recipe) => recipe.uuid);
+
+        // If recipe is already selected, deselect it
+        if (selectedRecipes.includes(recipe)) {
+            setSelectedRecipeUuids(
+                mapped.filter((uuid) => uuid !== recipe.uuid),
+            );
+        }
+        // Else add the recipe to the list
+        else {
+            setSelectedRecipeUuids([...mapped, recipe.uuid]);
+        }
+
+        chosenMessageInd = 1 - chosenMessageInd;
+    };
+
+    const message: string[] = [
+        'Add to Shopping List',
+        'Remove from Shopping List',
+    ];
+    let chosenMessageInd = selectedRecipes.includes(p.recipe) ? 1 : 0;
+
+    return (
+        <Button onClick={() => handleClick(p.recipe)}>
+            {message[chosenMessageInd]}
+        </Button>
     );
 }
 
@@ -452,9 +547,13 @@ interface CriteriaDropdownProps {
 interface AppliedFiltersContextValue {
     appliedFilters: AppliedFilters;
     setAppliedFilters: Dispatch<SetStateAction<AppliedFilters>>;
+    filteredRecipes: Recipe[];
+    setFilteredRecipes: Dispatch<SetStateAction<Recipe[]>>;
 }
 
 const AppliedFiltersContext = createContext<AppliedFiltersContextValue>({
     appliedFilters: {},
     setAppliedFilters: () => null,
+    filteredRecipes: [],
+    setFilteredRecipes: () => null,
 });
