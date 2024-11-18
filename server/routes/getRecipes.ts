@@ -8,9 +8,9 @@ interface Recipe {
     difficulty: string;
     prep_time: number;
     cook_time: number;
-    notes: string;
     ingredients: Ingredient[];
     instructions: Instructions[];
+    notes: string;
 }
 
 interface RecipeDetails {
@@ -60,15 +60,15 @@ const getRecipes: RequestHandler = async (req, res) => {
                     difficulty: row.difficulty,
                     prep_time: row.prep_time,
                     cook_time: row.cook_time,
-                    notes: row.notes,
                     ingredients: [],
                     instructions: [],
+                    notes: row.notes,
                 });
             }
             recipeMap.get(row.uuid)!.ingredients.push({
-                name: row.ingredient_name,
                 quantity: row.quantity,
                 unit: row.unit,
+                name: row.ingredient_name,
             });
             recipeMap.get(row.uuid)!.instructions.push({
                 text: row.text,
