@@ -5,7 +5,6 @@ const RecipeCreation: React.FC = () => {
     const [recipeName, setRecipeName] = useState<string>('');
     const [prepTime, setPrepTime] = useState<number>(30);
     const [difficulty, setDifficulty] = useState<string>('easy');
-    const [rating, setRating] = useState<number>(1);
     const [ingredients, setIngredients] = useState<string[]>(['']); // Start with one ingredient input
 
     // Add a new ingredient input
@@ -63,20 +62,6 @@ const RecipeCreation: React.FC = () => {
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Rating:</label>
-                <select
-                    value={rating}
-                    onChange={(e) => setRating(Number(e.target.value))}
-                >
-                    <option value={1}>1</option>
-                    <option value={2}>2</option>
-                    <option value={3}>3</option>
-                    <option value={4}>4</option>
-                    <option value={5}>5</option>
                 </select>
             </div>
 
