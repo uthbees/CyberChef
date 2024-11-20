@@ -3,13 +3,13 @@ import { openDb } from '../utils/openDb';
 
 interface Recipe {
     uuid: string;
-    recipe_name: string;
+    name: string;
     description: string;
     difficulty: string;
     prep_time: number;
     cook_time: number;
     ingredients: Ingredient[];
-    instructions: Instructions[];
+    instructions: string[];
     notes: string;
 }
 
@@ -33,10 +33,6 @@ interface Ingredient {
     unit: string;
 }
 
-interface Instructions {
-    text: string;
-}
-
 const getRecipes: RequestHandler = async (req, res) => {
     try {
         const db = await openDb();
@@ -55,7 +51,7 @@ const getRecipes: RequestHandler = async (req, res) => {
             if (!recipeMap.has(row.uuid)) {
                 recipeMap.set(row.uuid, {
                     uuid: row.uuid,
-                    recipe_name: row.recipe_name,
+                    name: row.recipe_name,
                     description: row.description,
                     difficulty: row.difficulty,
                     prep_time: row.prep_time,
@@ -70,9 +66,7 @@ const getRecipes: RequestHandler = async (req, res) => {
                 unit: row.unit,
                 name: row.ingredient_name,
             });
-            recipeMap.get(row.uuid)!.instructions.push({
-                text: row.text,
-            });
+            recipeMap.get(row.uuid)!.instructions.push(row.text);
         });
         console.log('Recipes loaded successfully', rows);
         res.status(200).json(Array.from(recipeMap.values()));
