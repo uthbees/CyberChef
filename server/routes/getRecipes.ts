@@ -3,7 +3,7 @@ import { openDb } from '../utils/openDb';
 
 interface Recipe {
     uuid: string;
-    recipe_name: string;
+    name: string;
     description: string;
     difficulty: string;
     prep_time: number;
@@ -58,7 +58,7 @@ const getRecipes: RequestHandler = async (req, res) => {
             if (!recipeMap.has(row.uuid)) {
                 recipeMap.set(row.uuid, {
                     uuid: row.uuid,
-                    recipe_name: row.recipe_name,
+                    name: row.recipe_name,
                     description: row.description,
                     difficulty: row.difficulty,
                     prep_time: row.prep_time,
