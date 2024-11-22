@@ -16,6 +16,7 @@ import {
     Box,
     IconButton,
     TextField,
+    Chip,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
@@ -96,10 +97,17 @@ export default function RecipeSearchPage() {
 
 function IntroHeader() {
     return (
-        <div>
-            <h1>stub implementation - recipe search</h1>
-            <p>optional text</p>
-        </div>
+        <Box
+            sx={{
+                // margin: 'auto',
+                textAlign: 'center',
+            }}
+        >
+            <h1 style={{ fontFamily: 'Rokkitt' }}>
+                Stub implementation - Recipe Search
+            </h1>
+            <p style={{ fontFamily: 'Montserrat' }}>Optional text</p>
+        </Box>
     );
 }
 
@@ -124,7 +132,7 @@ function SearchDiv() {
 function SearchForm() {
     return (
         <form id="search-form" action="/my-handling-form-page" method="post">
-            <Grid2 container spacing={4}>
+            <Grid2 container spacing={4} marginBottom={4}>
                 <SearchBar />
                 <Filters />
             </Grid2>
@@ -281,6 +289,7 @@ function Filters() {
                     variant="contained"
                     onClick={applyFilter}
                     endIcon={<FilterAltIcon />}
+                    size="small"
                 >
                     Apply Filter
                 </Button>
@@ -345,7 +354,7 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
     return (
         <Grid2 size={4}>
             <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={!p.activeFilter}>
                     <InputLabel>{thisName}</InputLabel>
                     <Select
                         id="criteria-dropdown"
@@ -394,15 +403,30 @@ function ActiveFiltersWrapper() {
     if (Object.keys(appliedFilters).length === 0) {
         return (
             <Grid2 size={10}>
-                <p>No Active Filters</p>
+                <p style={{ fontFamily: 'Montserrat' }}>No Active Filters</p>
             </Grid2>
         );
     }
 
     return (
-        <Grid2 container spacing={4} size={10}>
+        <Grid2
+            container
+            spacing={0}
+            size={10}
+            // sx={{
+            //     '--Grid-borderWidth': '1px',
+            //     borderTop: 'var(--Grid-borderWidth) solid',
+            //     borderLeft: 'var(--Grid-borderWidth) solid',
+            //     borderColor: 'divider',
+            //     '& > div': {
+            //         borderRight: 'var(--Grid-borderWidth) solid',
+            //         borderBottom: 'var(--Grid-borderWidth) solid',
+            //         borderColor: 'divider',
+            //     },
+            // }}
+        >
             <Grid2 size={2}>
-                <p>Active Filters:</p>
+                <p style={{ fontFamily: 'Montserrat' }}>Active Filters:</p>
             </Grid2>
             <Grid2 container size={10}>
                 {Object.keys(appliedFilters).map((filter) => (
@@ -424,15 +448,12 @@ function AppliedFilterFlier(p: AppliedFilterFlierProps) {
         p.removeFilter(p.filter);
     };
     return (
-        <Grid2 container spacing={0}>
-            <Grid2 sx={{ margin: 'auto' }}>
-                <p>
-                    {yuh.filter.name}: {yuh.criterion.name}
-                </p>
-            </Grid2>
-            <Grid2 sx={{ margin: 'auto' }}>
-                <ClearXButton onClick={handleClick} />
-            </Grid2>
+        <Grid2 spacing={0} margin={0} padding={0}>
+            <Chip
+                sx={{ margin: 'auto' }}
+                label={`${yuh.filter.name}: ${yuh.criterion.name}`}
+                onDelete={handleClick}
+            ></Chip>
         </Grid2>
     );
 }
@@ -446,7 +467,7 @@ function SortByDropdown() {
 
     return (
         <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
-            <FormControl fullWidth>
+            <FormControl fullWidth size="small">
                 <InputLabel>{thisName}</InputLabel>
                 <Select
                     id="criteria-dropdown"
