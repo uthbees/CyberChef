@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import RecipeDialog from '../src/dialog';
 import { Button } from '@mui/material';
+import { useContext } from 'react';
+import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
 
 const RecipeSearchPage: React.FC = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    // Example recipe
-    const [selectedRecipe, setSelectedRecipe] = useState({
-        title: 'Chocolate Cake',
-        description: 'A delicious chocolate cake recipe with rich flavors.',
-    });
+    const { selectedRecipes, setSelectedRecipes } = useContext(
+        SelectedRecipesContext,
+    );
 
     const handleOpenDialog = () => setIsDialogOpen(true);
     const handleCloseDialog = () => setIsDialogOpen(false);
@@ -27,7 +27,7 @@ const RecipeSearchPage: React.FC = () => {
             <RecipeDialog
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
-                recipe={selectedRecipe}
+                recipe={selectedRecipes[0]}
             />
         </div>
     );
