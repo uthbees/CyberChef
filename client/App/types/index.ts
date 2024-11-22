@@ -18,8 +18,4 @@ export interface Ingredient {
     uiChecked?: boolean;
 }
 
-export enum RecipeDifficulty {
-    EASY = 'Easy',
-    INTERMEDIATE = 'Intermediate',
-    EXPERT = 'Expert',
-}
+export type RecipeDifficulty = 'Easy' | 'Intermediate' | 'Advanced';

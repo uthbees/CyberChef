@@ -2,6 +2,7 @@ import { createContext, ReactNode, useMemo, useState } from 'react';
 import { Recipe } from './types';
 import useInitialSetup from '../utils/useInitialSetup';
 import serverUrl from './config/serverUrl';
+import { PostRecipesBody } from '../../server/routes/postRecipes';
 
 export default function AllRecipesContextProvider({
     children,
@@ -48,8 +49,52 @@ export default function AllRecipesContextProvider({
     });
 
     const contextValue = useMemo(() => {
+        const createRecipe: CreateRecipeFunction = async (
+            requestBody,
+            options,
+        ) => {
+            const result = await fetch(`${serverUrl}/recipes`, {
+                method: 'POST',
+                body: JSON.stringify(requestBody),
+            });
+
+            if (result.ok) {
+                const json: unknown = await result.json();
+                if (
+                    typeof json !== 'object' ||
+                    json === null ||
+                    !('uuid' in json) ||
+                    typeof json.uuid !== 'string'
+                ) {
+                    throw new Error("Response didn't include uuid");
+                }
+
+                const uuid = json.uuid;
+
+                setRecipes((prevState) => ({
+                    ...prevState,
+                    [uuid]: {
+                        uuid,
+                        name: requestBody.name,
+                        description: requestBody.description,
+                        difficulty: requestBody.difficulty,
+                        prepTimeMin: requestBody.prep_time,
+                        cookTimeMin: requestBody.cook_time,
+                        ingredients: requestBody.ingredients,
+                        instructions: requestBody.instructions,
+                        note: requestBody.notes,
+                    },
+                }));
+
+                options?.onSuccess?.();
+            } else {
+                options?.onError?.();
+            }
+        };
+
         return {
             recipes,
+            createRecipe,
         };
     }, [recipes]);
 
@@ -60,10 +105,17 @@ export default function AllRecipesContextProvider({
     );
 }
 
+type CreateRecipeFunction = (
+    recipe: PostRecipesBody,
+    options?: { onSuccess?: () => void; onError?: () => void },
+) => void;
+
 interface AllRecipesContextValue {
     recipes: Record<string, Recipe>;
+    createRecipe: CreateRecipeFunction;
 }
 
 export const AllRecipesContext = createContext<AllRecipesContextValue>({
     recipes: {},
+    createRecipe: () => {},
 });

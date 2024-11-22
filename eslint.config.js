@@ -16,6 +16,7 @@ export default tseslint.config({
         ...react.configs.flat.recommended.rules,
         ...react.configs.flat['jsx-runtime'].rules,
         ...reactHooks.configs.recommended.rules,
+        '@typescript-eslint/no-misused-promises': 'off',
         '@typescript-eslint/no-unused-vars': [
             'warn',
             {

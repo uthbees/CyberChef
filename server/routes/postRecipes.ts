@@ -87,3 +87,4 @@ const postRecipesBody = type({
     instructions: type.string.atLeastLength(1).atMostLength(1000).array(),
     notes: type.string.atLeastLength(0).atMostLength(5000),
 });
+export type PostRecipesBody = typeof postRecipesBody.infer;
