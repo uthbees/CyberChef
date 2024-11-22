@@ -46,6 +46,7 @@ function RecipeCreationForm({
 
     // State to store the recipe information
     const [recipeName, setRecipeName] = useState<string>('');
+    const [recipeDescription, setRecipeDescription] = useState<string>('');
     const [prepTime, setPrepTime] = useState<number>(30);
     const [cookTime, setCookTime] = useState<number>(30);
     const [difficulty, setDifficulty] = useState<RecipeDifficulty>('Easy');
@@ -71,7 +72,7 @@ function RecipeCreationForm({
 
                 const requestBody: PostRecipesBody = {
                     name: recipeName,
-                    description: '',
+                    description: recipeDescription,
                     difficulty,
                     prep_time: prepTime,
                     cook_time: cookTime,
@@ -100,6 +101,17 @@ function RecipeCreationForm({
                     value={recipeName}
                     onChange={(e) => setRecipeName(e.target.value)}
                     placeholder="Enter recipe name"
+                    required
+                />
+            </div>
+
+            <div>
+                <label>Description:</label>
+                <input
+                    type="text"
+                    value={recipeDescription}
+                    onChange={(e) => setRecipeDescription(e.target.value)}
+                    placeholder="Enter recipe description"
                     required
                 />
             </div>
@@ -144,7 +156,7 @@ function RecipeCreationForm({
                 >
                     <option value="Easy">Easy</option>
                     <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
                 </select>
             </div>
 
@@ -159,6 +171,7 @@ function RecipeCreationForm({
                                 handleIngredientChange(index, e.target.value)
                             }
                             placeholder={`Ingredient ${index + 1}`}
+                            required
                         />
                     </div>
                 ))}
@@ -175,7 +188,7 @@ function RecipeCreationForm({
 }
 
 function stringIsRecipeDifficulty(str: string): str is RecipeDifficulty {
-    return ['Easy', 'Intermediate', 'Advanced'].includes(str);
+    return ['Easy', 'Intermediate', 'Expert'].includes(str);
 }
 
 enum RecipeCreationStatus {

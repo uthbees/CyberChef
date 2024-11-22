@@ -18,4 +18,4 @@ export interface Ingredient {
     uiChecked?: boolean;
 }
 
-export type RecipeDifficulty = 'Easy' | 'Intermediate' | 'Advanced';
+export type RecipeDifficulty = 'Easy' | 'Intermediate' | 'Expert';

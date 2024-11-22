@@ -13,7 +13,24 @@ interface Recipe {
     notes: string;
 }
 
-interface RecipeDetails {
+interface Ingredient {
+    name: string;
+    quantity: number;
+    unit?: string;
+}
+
+// The Intermediate interfaces represent the data in the intermediate phase, when it's
+// been only partially transformed.
+interface IntermediateRecipe extends Omit<Recipe, 'instructions'> {
+    instructions: { text: string; step_number: number }[];
+    ingredients: IntermediateIngredient[];
+}
+
+interface IntermediateIngredient extends Ingredient {
+    order: number;
+}
+
+interface RecipeQueryResult {
     uuid: string;
     recipe_name: string;
     description: string;
@@ -21,16 +38,12 @@ interface RecipeDetails {
     prep_time: number;
     cook_time: number;
     notes: string;
-    ingredient_name: string;
-    quantity: number;
-    unit: string;
-    text: string;
-}
-
-interface Ingredient {
-    name: string;
-    quantity: number;
-    unit: string;
+    ingredient_name?: string;
+    ingredient_quantity?: number;
+    ingredient_unit?: string;
+    ingredient_order?: number;
+    instruction?: string;
+    instruction_step_number?: number;
 }
 
 const getRecipes: RequestHandler = async (req, res) => {
@@ -38,16 +51,17 @@ const getRecipes: RequestHandler = async (req, res) => {
         const db = await openDb();
         const rows = await db.all(
             'SELECT' +
-                ' recipes.name AS recipe_name, recipes.uuid, recipes.description, recipes.difficulty,' +
-                ' recipes.prep_time_min AS prep_time, recipes.cook_time_min AS cook_time, recipes.notes,' +
-                ' ingredients.quantity, ingredients.unit, ingredients.ingredient_order, ingredients.name AS ingredient_name,' +
-                ' instructions.text' +
-                ' FROM recipes' +
-                ' JOIN ingredients ON recipes.recipes_id = ingredients.recipes_id' +
-                ' JOIN instructions ON recipes.recipes_id = instructions.recipes_id',
+                ' Recipes.uuid, Recipes.name AS recipe_name, Recipes.description, Recipes.difficulty,' +
+                ' Recipes.prep_time_min AS prep_time, Recipes.cook_time_min AS cook_time, Recipes.notes,' +
+                ' Ingredients.name AS ingredient_name, Ingredients.quantity AS ingredient_quantity,' +
+                ' Ingredients.unit AS ingredient_unit, Ingredients.ingredient_order,' +
+                ' Instructions.text AS instruction, Instructions.step_number AS instruction_step_number' +
+                ' FROM Recipes' +
+                ' LEFT JOIN Ingredients ON Recipes.recipes_id = Ingredients.recipes_id' +
+                ' LEFT JOIN Instructions ON Recipes.recipes_id = Instructions.recipes_id',
         );
-        const recipeMap: Map<string, Recipe> = new Map();
-        rows.forEach((row: RecipeDetails) => {
+        const recipeMap: Map<string, IntermediateRecipe> = new Map();
+        rows.forEach((row: RecipeQueryResult) => {
             if (!recipeMap.has(row.uuid)) {
                 recipeMap.set(row.uuid, {
                     uuid: row.uuid,
@@ -61,19 +75,73 @@ const getRecipes: RequestHandler = async (req, res) => {
                     notes: row.notes,
                 });
             }
-            recipeMap.get(row.uuid)!.ingredients.push({
-                quantity: row.quantity,
-                unit: row.unit,
-                name: row.ingredient_name,
-            });
-            recipeMap.get(row.uuid)!.instructions.push(row.text);
+            if (isSet(row.ingredient_name)) {
+                if (
+                    !isSet(row.ingredient_quantity) ||
+                    !isSet(row.ingredient_order)
+                ) {
+                    throw new Error(
+                        'ingredient quantity/order should never be undefined when ingredient_name is defined',
+                    );
+                }
+                const ingredient: IntermediateIngredient = {
+                    name: row.ingredient_name,
+                    quantity: row.ingredient_quantity,
+                    order: row.ingredient_order,
+                };
+                if (isSet(row.ingredient_unit)) {
+                    ingredient.unit = row.ingredient_unit;
+                }
+                recipeMap.get(row.uuid)!.ingredients.push(ingredient);
+            }
+            if (isSet(row.instruction)) {
+                if (!isSet(row.instruction_step_number)) {
+                    throw new Error(
+                        'instruction step number should never be undefined when instruction is defined',
+                    );
+                }
+                recipeMap.get(row.uuid)!.instructions.push({
+                    text: row.instruction,
+                    step_number: row.instruction_step_number,
+                });
+            }
         });
-        console.log('Recipes loaded successfully', rows);
-        res.status(200).json(Array.from(recipeMap.values()));
+
+        const finalRecipes: Recipe[] = Array.from(recipeMap.values()).map(
+            convertIntermediateToFinalRecipe,
+        );
+
+        console.log('Recipes loaded successfully');
+        res.status(200).json(finalRecipes);
     } catch (err) {
         console.error('Error loading recipes', err);
         res.status(500).send();
     }
 };
+
+function convertIntermediateToFinalRecipe(recipe: IntermediateRecipe): Recipe {
+    const finalInstructions = recipe.instructions
+        .sort((a, b) => a.step_number - b.step_number)
+        .map((instruction) => instruction.text);
+
+    const finalIngredients = recipe.ingredients
+        .sort((a, b) => a.order - b.order)
+        .map((ingredient) => {
+            // Remove order
+            const { order, ...finalIngredient } = ingredient;
+            return finalIngredient;
+        });
+
+    return {
+        ...recipe,
+        instructions: finalInstructions,
+        ingredients: finalIngredients,
+    };
+}
+
+// Utility function to check if a variable is either null or undefined.
+function isSet<T>(variable: T | undefined | null): variable is T {
+    return variable !== null && variable !== undefined;
+}
 
 export default getRecipes;

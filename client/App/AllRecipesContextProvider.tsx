@@ -56,6 +56,7 @@ export default function AllRecipesContextProvider({
             const result = await fetch(`${serverUrl}/recipes`, {
                 method: 'POST',
                 body: JSON.stringify(requestBody),
+                headers: [['Content-Type', 'application/json']],
             });
 
             if (result.ok) {

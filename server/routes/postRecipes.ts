@@ -41,14 +41,14 @@ const postRecipes: RequestHandler = async (req, res) => {
             await db.run(
                 'INSERT INTO Instructions (text, step_number, Recipes_id) VALUES (?,?,?)',
                 requestBody.instructions[instructionIndex],
-                instructionIndex,
+                instructionIndex + 1,
                 insertResult.lastID,
             );
         }
 
         for (const ingredientIndex of requestBody.ingredients.keys()) {
             await db.run(
-                'INSERT INTO Ingredients (name, quantity, unit, ingredient_order, Recipes_id) VALUES (?, ?, ?, ?, ?)',
+                'INSERT INTO Ingredients (name, quantity, unit, ingredient_order, Recipes_id) VALUES (?,?,?,?,?)',
                 requestBody.ingredients[ingredientIndex].name,
                 requestBody.ingredients[ingredientIndex].quantity,
                 requestBody.ingredients[ingredientIndex].unit,
@@ -73,14 +73,14 @@ export default postRecipes;
 
 const ingredient = type({
     quantity: type.number.atLeast(1),
-    unit: type.string.optional().atLeastLength(1).atMostLength(100),
+    'unit?': type.string.atLeastLength(1).atMostLength(100),
     name: type.string.atLeastLength(1).atMostLength(100),
 });
 
 const postRecipesBody = type({
     name: type.string.atLeastLength(1).atMostLength(100),
     description: type.string.atLeastLength(1).atMostLength(5000),
-    difficulty: "'Easy' | 'Intermediate' | 'Advanced'",
+    difficulty: "'Easy' | 'Intermediate' | 'Expert'",
     prep_time: type.number.atLeast(1).atMost(1000),
     cook_time: type.number.atLeast(1).atMost(1000),
     ingredients: ingredient.array(),
