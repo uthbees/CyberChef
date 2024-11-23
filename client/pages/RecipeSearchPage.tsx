@@ -17,9 +17,12 @@ import {
     IconButton,
     TextField,
     Chip,
+    Fab,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
@@ -72,10 +75,9 @@ export default function RecipeSearchPage() {
     //     SelectedRecipesContext,
     // );
 
-    // const { recipes } = useContext(AllRecipesContext);
-
+    const { recipes } = useContext(AllRecipesContext);
     const AFState = useState<AppliedFilters>({});
-    const FRState = useState<Recipe[]>([]);
+    const FRState = useState<Recipe[]>(Object.values(recipes));
     const AFValue: AppliedFiltersContextValue = {
         appliedFilters: AFState[0],
         setAppliedFilters: AFState[1],
@@ -84,7 +86,7 @@ export default function RecipeSearchPage() {
     };
 
     return (
-        <div>
+        <div id="RecipeSearchPage" style={{ margin: 50 }}>
             <AppliedFiltersContext.Provider value={AFValue}>
                 <IntroHeader />
                 <SearchDiv />
@@ -98,6 +100,7 @@ export default function RecipeSearchPage() {
 function IntroHeader() {
     return (
         <Box
+            id="IntroHeader"
             sx={{
                 // margin: 'auto',
                 textAlign: 'center',
@@ -114,12 +117,14 @@ function IntroHeader() {
 function SearchDiv() {
     return (
         <Box
+            id="SearchDiv"
             sx={{
                 p: 2,
-                bgcolor: '#eee',
+                bgcolor: '#E4E2DC',
                 border: '5px solid #201C1C',
-                borderRadius: 4,
+                borderRadius: 5,
                 margin: 'auto',
+                padding: 0,
             }}
             maxWidth={1000}
         >
@@ -131,8 +136,14 @@ function SearchDiv() {
 
 function SearchForm() {
     return (
-        <form id="search-form" action="/my-handling-form-page" method="post">
-            <Grid2 container spacing={4} marginBottom={4}>
+        <form id="SearchForm" action="/my-handling-form-page" method="post">
+            <Grid2
+                container
+                spacing={4}
+                marginBottom={1}
+                padding={2}
+                alignItems={'center'}
+            >
                 <SearchBar />
                 <Filters />
             </Grid2>
@@ -141,14 +152,55 @@ function SearchForm() {
 }
 
 function SearchBar() {
+    const { recipes } = useContext(AllRecipesContext);
+    const [searchQuery, setSearchQuery] = useState('');
+    const { appliedFilters, filteredRecipes, setFilteredRecipes } = useContext(
+        AppliedFiltersContext,
+    );
+    const filterRecipes = (recipe: Recipe) => {
+        for (const applied of Object.values(appliedFilters)) {
+            if (
+                !applied.filter.recipeMeetsCriterion(recipe, applied.criterion)
+            ) {
+                return false;
+            }
+        }
+        return true;
+    };
+    const handleClick = () => {
+        if (searchQuery === '') {
+            setFilteredRecipes(Object.values(recipes).filter(filterRecipes));
+            console.log(
+                'Filtered recipes: ',
+                Object.values(recipes).filter(filterRecipes),
+            );
+        }
+        setFilteredRecipes(
+            Object.values(filteredRecipes).filter((recipe) =>
+                recipe.name.toLowerCase().includes(searchQuery.toLowerCase()),
+            ),
+        );
+        console.log('Search query: ', searchQuery);
+    };
+
     return (
-        <Grid2 container spacing={4} size={6}>
-            <SearchInput />
+        <Grid2
+            id="SearchBar"
+            container
+            spacing={4}
+            size={6}
+            alignItems={'center'}
+        >
+            <SearchInput
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
             <Grid2 size={4}>
                 <Button
                     endIcon={<SearchIcon />}
                     variant="contained"
                     id="search-button"
+                    onClick={handleClick}
                 >
                     Search
                 </Button>
@@ -157,24 +209,27 @@ function SearchBar() {
     );
 }
 
-function SearchInput() {
-    const [searchQuery, setSearchQuery] = useState('');
+function SearchInput(p: {
+    searchQuery: string;
+    setSearchQuery: (value: string) => void;
+}) {
     const handleChange = (
         e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
     ) => {
-        setSearchQuery(e.target.value);
+        p.setSearchQuery(e.target.value);
     };
     const handleClick = () => {
-        setSearchQuery('');
+        p.setSearchQuery('');
     };
     return (
-        <Grid2 size={8}>
+        <Grid2 id="SearchInput" size={8} alignItems={'center'}>
             <TextField
+                sx={{ bgcolor: '#F4F2EC', width: '100%' }}
                 label="Search for recipes..."
                 variant="outlined"
                 name="search-input"
                 id="search-input"
-                value={searchQuery}
+                value={p.searchQuery}
                 onChange={(e) => handleChange(e)}
             />
             <ClearXButton onClick={handleClick} />
@@ -185,7 +240,11 @@ function SearchInput() {
 function ClearXButton({ onClick }: { onClick: () => void }) {
     //variant="text" id="clear-x-button"
     return (
-        <IconButton onClick={onClick} size="small">
+        <IconButton
+            sx={{ marginTop: 1.25, marginLeft: -4.5 }}
+            onClick={onClick}
+            size="small"
+        >
             <ClearIcon />
         </IconButton>
     );
@@ -193,57 +252,90 @@ function ClearXButton({ onClick }: { onClick: () => void }) {
 
 function Filters() {
     const filters: Filters = {
-        tags: {
-            name: 'Tag',
-            value: 'tags',
-            onlyOneFilterAtATime: false,
-            criteria: [
-                { name: 'Tag1', value: 'tag1' },
-                { name: 'Tag2', value: 'tag2' },
-                { name: 'Tag3', value: 'tag3' },
-            ],
-        },
         diff: {
             name: 'Difficulty',
             value: 'diff',
             onlyOneFilterAtATime: true,
             criteria: [
-                { name: 'Easy', value: 'easy' },
-                { name: 'Intermediate', value: 'medi' },
-                { name: 'Expert', value: 'hard' },
+                { name: 'Easy', value: 'Easy' },
+                { name: 'Intermediate', value: 'Intermediate' },
+                { name: 'Expert', value: 'Expert' },
             ],
-        },
-        rate: {
-            name: 'Rating',
-            value: 'rate',
-            onlyOneFilterAtATime: true,
-            criteria: [
-                { name: '≥2 stars', value: '2star' },
-                { name: '≥3 stars', value: '3star' },
-                { name: '≥4 stars', value: '4star' },
-                { name: '5 stars', value: '5star' },
-            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                return recipe.difficulty === criterion.value;
+            },
         },
         time: {
             name: 'Total time',
             value: 'time',
             onlyOneFilterAtATime: true,
             criteria: [
-                { name: '≤15 min', value: '15min' },
-                { name: '≤30 min', value: '30min' },
-                { name: '≤1 hr', value: '1hour' },
-                { name: '≤2 hr', value: '2hour' },
+                { name: '≤15 min', value: '15' },
+                { name: '≤30 min', value: '30' },
+                { name: '≤1 hr', value: '60' },
+                { name: '≤2 hr', value: '120' },
             ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                return (
+                    recipe.prepTimeMin + recipe.cookTimeMin <=
+                    Number(criterion.value)
+                );
+            },
+        },
+        tags: {
+            name: 'Tag (N/A)',
+            value: 'tags',
+            onlyOneFilterAtATime: false,
+            criteria: [
+                { name: 'Tag1', value: 'Tag1' },
+                { name: 'Tag2', value: 'Tag2' },
+                { name: 'Tag3', value: 'Tag3' },
+            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                // TODO: Implement
+                if (recipe && criterion) {
+                }
+                return true;
+            },
+        },
+        rate: {
+            name: 'Rating (N/A)',
+            value: 'rate',
+            onlyOneFilterAtATime: true,
+            criteria: [
+                { name: '≥2 stars', value: '2' },
+                { name: '≥3 stars', value: '3' },
+                { name: '≥4 stars', value: '4' },
+                { name: '5 stars', value: '5' },
+            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                // TODO: Implement
+                if (recipe && criterion) {
+                }
+                return true;
+            },
         },
     };
 
+    const { recipes } = useContext(AllRecipesContext);
     const [selectedFilter, setSelectedFilter] = useState('none');
     const [selectedCriterion, setSelectedCriterion] = useState('none');
-    const { appliedFilters, setAppliedFilters } = useContext(
-        AppliedFiltersContext,
-    );
+    const { appliedFilters, setAppliedFilters, setFilteredRecipes } =
+        useContext(AppliedFiltersContext);
+
+    const filterRecipes = (recipe: Recipe) => {
+        for (const applied of Object.values(appliedFilters)) {
+            if (
+                !applied.filter.recipeMeetsCriterion(recipe, applied.criterion)
+            ) {
+                return false;
+            }
+        }
+        return true;
+    };
 
     const applyFilter = () => {
+        console.log('Applying filter: ', selectedFilter, selectedCriterion);
         if (
             // Cases to prevent applying a filter
             selectedFilter === 'none' ||
@@ -270,10 +362,19 @@ function Filters() {
             criterion: crit,
         };
         setAppliedFilters(newFilters);
+        console.log('New filters set: ', newFilters);
+    };
+
+    const fixThis = () => {
+        setFilteredRecipes(Object.values(recipes).filter(filterRecipes));
+        console.log(
+            'Filtered recipes: ',
+            Object.values(recipes).filter(filterRecipes),
+        );
     };
 
     return (
-        <Grid2 container spacing={4} size={6}>
+        <Grid2 id="Filters" container spacing={4} size={6}>
             <FilterByDropdown
                 filters={filters}
                 selectedFilter={selectedFilter}
@@ -289,11 +390,11 @@ function Filters() {
                     variant="contained"
                     onClick={applyFilter}
                     endIcon={<FilterAltIcon />}
-                    size="small"
                 >
-                    Apply Filter
+                    Apply
                 </Button>
             </Grid2>
+            <Button onClick={fixThis}>Debug</Button>
         </Grid2>
     );
 }
@@ -307,7 +408,7 @@ function FilterByDropdown(p: FilterByDropdownProps) {
     const thisName = 'Filter by...';
 
     return (
-        <Grid2 size={4}>
+        <Grid2 id="FilterByDropdown" size={4}>
             <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
                 <FormControl fullWidth>
                     <InputLabel>{thisName}</InputLabel>
@@ -352,7 +453,7 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
     const thisName = 'Criteria...';
 
     return (
-        <Grid2 size={4}>
+        <Grid2 id="CriteriaDropdown" size={4}>
             <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
                 <FormControl fullWidth disabled={!p.activeFilter}>
                     <InputLabel>{thisName}</InputLabel>
@@ -379,8 +480,17 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
 
 function FiltersStrip() {
     return (
-        <Box sx={{ maxWidth: 'auto' }}>
-            <Grid2 container spacing={4}>
+        <Box
+            id="FiltersStrip"
+            sx={{
+                maxWidth: 'auto',
+                margin: 'auto',
+                bgcolor: '#D4D2CC',
+                padding: 2,
+                borderRadius: 4,
+            }}
+        >
+            <Grid2 container spacing={4} alignItems={'center'}>
                 <ActiveFiltersWrapper />
                 <SortByDropdown />
             </Grid2>
@@ -402,14 +512,17 @@ function ActiveFiltersWrapper() {
 
     if (Object.keys(appliedFilters).length === 0) {
         return (
-            <Grid2 size={10}>
-                <p style={{ fontFamily: 'Montserrat' }}>No Active Filters</p>
+            <Grid2 id="ActiveFiltersWrapper" size={10}>
+                <p style={{ fontFamily: 'Montserrat', margin: 'auto' }}>
+                    No Active Filters
+                </p>
             </Grid2>
         );
     }
 
     return (
         <Grid2
+            id="ActiveFiltersWrapper"
             container
             spacing={0}
             size={10}
@@ -426,11 +539,19 @@ function ActiveFiltersWrapper() {
             // }}
         >
             <Grid2 size={2}>
-                <p style={{ fontFamily: 'Montserrat' }}>Active Filters:</p>
+                <p
+                    style={{
+                        fontFamily: 'Montserrat',
+                        margin: 'auto',
+                        marginTop: 6,
+                    }}
+                >
+                    Active Filters:
+                </p>
             </Grid2>
             <Grid2 container size={10}>
                 {Object.keys(appliedFilters).map((filter) => (
-                    <AppliedFilterFlier
+                    <AppliedFilterChip
                         key={appliedFilters[filter].filter.value}
                         filter={filter}
                         appliedFilters={appliedFilters}
@@ -442,15 +563,15 @@ function ActiveFiltersWrapper() {
     );
 }
 
-function AppliedFilterFlier(p: AppliedFilterFlierProps) {
+function AppliedFilterChip(p: AppliedFilterFlierProps) {
     const yuh = p.appliedFilters[p.filter];
     const handleClick = () => {
         p.removeFilter(p.filter);
     };
     return (
-        <Grid2 spacing={0} margin={0} padding={0}>
+        <Grid2 margin={0} padding={0}>
             <Chip
-                sx={{ margin: 'auto' }}
+                sx={{ margin: 'auto', marginRight: 1 }}
                 label={`${yuh.filter.name}: ${yuh.criterion.name}`}
                 onDelete={handleClick}
             ></Chip>
@@ -466,7 +587,10 @@ function SortByDropdown() {
     const thisName = 'Sort by...';
 
     return (
-        <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
+        <Box
+            id="SortByDropdown"
+            sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}
+        >
             <FormControl fullWidth size="small">
                 <InputLabel>{thisName}</InputLabel>
                 <Select
@@ -478,8 +602,8 @@ function SortByDropdown() {
                     <MenuItem selected>Sort by...</MenuItem>
                     <MenuItem>Alphabetical</MenuItem>
                     <MenuItem>Difficulty</MenuItem>
-                    <MenuItem>Rating</MenuItem>
                     <MenuItem>Time</MenuItem>
+                    <MenuItem>Rating (N/A)</MenuItem>
                 </Select>
             </FormControl>
         </Box>
@@ -488,12 +612,29 @@ function SortByDropdown() {
 
 function SearchResults() {
     const {
-        recipes, //setSelectedRecipes
+        // recipes, //setSelectedRecipes
     } = useContext(AllRecipesContext);
+    const {
+        // appliedFilters, //setAppliedFilters,
+        filteredRecipes,
+        // setFilteredRecipes,
+    } = useContext(AppliedFiltersContext);
 
     return (
-        <Grid2 container spacing={4}>
-            {Object.values(recipes).map((r, index) => (
+        <Grid2
+            container
+            spacing={6}
+            sx={{
+                maxWidth: '1000px',
+                margin: 'auto',
+                marginTop: 6,
+                border: '5px solid #201C1C',
+                borderRadius: 5,
+                padding: 3,
+                bgcolor: '#E8C3A2',
+            }}
+        >
+            {Object.values(filteredRecipes).map((r, index) => (
                 <RecipeCard key={index} index={index} recipe={r} />
             ))}
         </Grid2>
@@ -510,12 +651,22 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
 
     return (
         <Grid2 key={p.index} size={4}>
-            {/* <img src="https://placehold.co/200" /> */}
-            <h2>{p.recipe.name}</h2>
-            <p>Difficulty: {p.recipe.difficulty}</p>
-            <p>Total time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
-            {/* <p>Tags: {tags}</p> */}
-            <AddToShoppingListButton recipe={p.recipe} />
+            <Box
+                sx={{
+                    border: '4px solid #BA1F11',
+                    borderRadius: 3,
+                    bgcolor: '#F4F2EC',
+                    fontFamily: 'Montserrat',
+                    paddingX: 2,
+                }}
+            >
+                {/* <img src="https://placehold.co/200" /> */}
+                <h2 style={{ fontFamily: 'Rokkitt' }}>{p.recipe.name}</h2>
+                <p>Difficulty: {p.recipe.difficulty}</p>
+                <p>Time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
+                {/* <p>Tags: {tags}</p> */}
+                <AddToShoppingListButton recipe={p.recipe} />
+            </Box>
         </Grid2>
     );
 }
@@ -539,19 +690,18 @@ function AddToShoppingListButton(p: { recipe: Recipe }) {
             setSelectedRecipeUuids([...mapped, recipe.uuid]);
         }
 
-        chosenMessageInd = 1 - chosenMessageInd;
+        recipeIsIncluded = !recipeIsIncluded;
     };
 
-    const message: string[] = [
-        'Add to Shopping List',
-        'Remove from Shopping List',
-    ];
-    let chosenMessageInd = selectedRecipes.includes(p.recipe) ? 1 : 0;
+    let recipeIsIncluded = selectedRecipes.includes(p.recipe);
 
     return (
-        <Button onClick={() => handleClick(p.recipe)}>
-            {message[chosenMessageInd]}
-        </Button>
+        <Fab
+            color={recipeIsIncluded ? 'warning' : 'primary'}
+            onClick={() => handleClick(p.recipe)}
+        >
+            {recipeIsIncluded ? <RemoveIcon /> : <AddIcon />}
+        </Fab>
     );
 }
 
@@ -569,6 +719,7 @@ interface Filter {
     value: string;
     onlyOneFilterAtATime: boolean;
     criteria: Criterion[];
+    recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => boolean;
 }
 
 interface Filters {
