@@ -109,7 +109,6 @@ function IntroHeader() {
         <Box
             id="IntroHeader"
             sx={{
-                // margin: 'auto',
                 textAlign: 'center',
             }}
         >
@@ -254,7 +253,6 @@ function SearchInput(p: {
 }
 
 function ClearXButton({ onClick }: { onClick: () => void }) {
-    //variant="text" id="clear-x-button"
     return (
         <IconButton
             sx={{ marginTop: 1.25, marginLeft: -4.5 }}
@@ -396,7 +394,6 @@ function Filters() {
                     Apply
                 </Button>
             </Grid2>
-            {/* <Button onClick={fixThis}>Debug</Button> */}
         </Grid2>
     );
 }
@@ -420,9 +417,6 @@ function FilterByDropdown(p: FilterByDropdownProps) {
                         onChange={handleChange}
                         label={thisName}
                     >
-                        {/* <option selected key="none" value="none">
-                                Filter by...
-                            </option> */}
                         {Object.keys(p.filters).map(
                             (filter) =>
                                 filter != 'none' && (
@@ -465,9 +459,6 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
                         onChange={handleChange}
                         label={thisName}
                     >
-                        {/* <option key="none" value="none">
-                                Select criteria...
-                            </option> */}
                         {availableOptions.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
                                 {option.name}
@@ -523,23 +514,7 @@ function ActiveFiltersWrapper() {
     }
 
     return (
-        <Grid2
-            id="ActiveFiltersWrapper"
-            container
-            spacing={0}
-            size={10}
-            // sx={{
-            //     '--Grid-borderWidth': '1px',
-            //     borderTop: 'var(--Grid-borderWidth) solid',
-            //     borderLeft: 'var(--Grid-borderWidth) solid',
-            //     borderColor: 'divider',
-            //     '& > div': {
-            //         borderRight: 'var(--Grid-borderWidth) solid',
-            //         borderBottom: 'var(--Grid-borderWidth) solid',
-            //         borderColor: 'divider',
-            //     },
-            // }}
-        >
+        <Grid2 id="ActiveFiltersWrapper" container spacing={0} size={10}>
             <Grid2 size={2}>
                 <p
                     style={{
@@ -613,14 +588,7 @@ function SortByDropdown() {
 }
 
 function SearchResults() {
-    const {
-        // recipes, //setSelectedRecipes
-    } = useContext(AllRecipesContext);
-    const {
-        // appliedFilters, //setAppliedFilters,
-        filteredRecipes,
-        // setFilteredRecipes,
-    } = useContext(AppliedFiltersContext);
+    const { filteredRecipes } = useContext(AppliedFiltersContext);
 
     return (
         <Grid2
@@ -644,6 +612,7 @@ function SearchResults() {
 }
 
 function RecipeCard(p: { recipe: Recipe; index: number }) {
+    // TODO: Implement tags (restore the commented code below)
     // let tags: string = p.recipe.tags.join(', ');
     // tags = tags.charAt(0).toUpperCase() + tags.slice(1).toLowerCase();
     // const tagCutOff = 18;
@@ -763,12 +732,10 @@ interface AppliedFiltersContextValue {
     appliedFilters: AppliedFilters;
     setAppliedFilters: Dispatch<SetStateAction<AppliedFilters>>;
     filteredRecipes: Recipe[];
-    // setFilteredRecipes: Dispatch<SetStateAction<Recipe[]>>;
 }
 
 const AppliedFiltersContext = createContext<AppliedFiltersContextValue>({
     appliedFilters: {},
     setAppliedFilters: () => null,
     filteredRecipes: [],
-    // setFilteredRecipes: () => null,
 });
