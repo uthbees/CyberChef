@@ -168,26 +168,27 @@ function SearchBar() {
             return;
         }
 
+        const sq = 'sq:';
         const filt = {
             name: 'Includes',
             value: 'search',
-            onlyOneFilterAtATime: false,
+            onlyOneCritAtATime: false,
             criteria: [
                 {
                     name: `"${searchQuery}"`,
-                    value: 'sq:' + searchQuery,
+                    value: sq + searchQuery,
                 },
             ],
             recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
                 return recipe.name
                     .toLowerCase()
-                    .includes(criterion.value.slice(3).toLowerCase());
+                    .includes(criterion.value.slice(sq.length).toLowerCase());
             },
         } as Filter;
 
         const newFilters = { ...appliedFilters };
         newFilters[
-            filt.onlyOneFilterAtATime ? filt.value : filt.criteria[0].value
+            filt.onlyOneCritAtATime ? filt.value : filt.criteria[0].value
         ] = {
             filter: filt,
             criterion: filt.criteria[0],
@@ -233,7 +234,7 @@ function SearchInput(p: {
     ) => {
         p.setSearchQuery(e.target.value);
     };
-    const handleClick = () => {
+    const handleXClick = () => {
         p.setSearchQuery('');
     };
     return (
@@ -247,7 +248,7 @@ function SearchInput(p: {
                 value={p.searchQuery}
                 onChange={(e) => handleChange(e)}
             />
-            <ClearXButton onClick={handleClick} />
+            <ClearXButton onClick={handleXClick} />
         </Grid2>
     );
 }
@@ -269,7 +270,7 @@ function Filters() {
         diff: {
             name: 'Difficulty',
             value: 'diff',
-            onlyOneFilterAtATime: true,
+            onlyOneCritAtATime: true,
             criteria: [
                 { name: 'Easy', value: 'Easy' },
                 { name: 'Intermediate', value: 'Intermediate' },
@@ -282,12 +283,12 @@ function Filters() {
         time: {
             name: 'Total time',
             value: 'time',
-            onlyOneFilterAtATime: true,
+            onlyOneCritAtATime: true,
             criteria: [
-                { name: '≤15 min', value: '15' },
-                { name: '≤30 min', value: '30' },
-                { name: '≤1 hr', value: '60' },
-                { name: '≤2 hr', value: '120' },
+                { name: '≤ 15 min', value: '15' },
+                { name: '≤ 30 min', value: '30' },
+                { name: '≤ 1 hr', value: '60' },
+                { name: '≤ 2 hr', value: '120' },
             ],
             recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
                 return (
@@ -299,7 +300,7 @@ function Filters() {
         tags: {
             name: 'Tag (N/A)',
             value: 'tags',
-            onlyOneFilterAtATime: false,
+            onlyOneCritAtATime: false,
             criteria: [
                 { name: 'Tag1', value: 'Tag1' },
                 { name: 'Tag2', value: 'Tag2' },
@@ -315,7 +316,7 @@ function Filters() {
         rate: {
             name: 'Rating (N/A)',
             value: 'rate',
-            onlyOneFilterAtATime: true,
+            onlyOneCritAtATime: true,
             criteria: [
                 { name: '≥2 stars', value: '2' },
                 { name: '≥3 stars', value: '3' },
@@ -357,7 +358,7 @@ function Filters() {
             return;
         }
         newFilters[
-            filters[selectedFilter].onlyOneFilterAtATime
+            filters[selectedFilter].onlyOneCritAtATime
                 ? selectedFilter
                 : selectedCriterion
         ] = {
@@ -688,7 +689,7 @@ interface Criterion {
 interface Filter {
     name: string;
     value: string;
-    onlyOneFilterAtATime: boolean;
+    onlyOneCritAtATime: boolean;
     criteria: Criterion[];
     recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => boolean;
 }
