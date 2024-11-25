@@ -1,8 +1,9 @@
 import { createContext, ReactNode, useMemo, useState } from 'react';
-import { Recipe } from './types';
+import { Recipe, RecipeDifficulty } from './types';
 import useInitialSetup from '../utils/useInitialSetup';
 import serverUrl from './config/serverUrl';
 import { PostRecipesBody } from '../../server/routes/postRecipes';
+import { ApiRecipe } from '../../server/routes/getRecipes';
 
 export default function AllRecipesContextProvider({
     children,
@@ -22,7 +23,8 @@ export default function AllRecipesContextProvider({
                     return;
                 }
 
-                const decoded: unknown = await response.json();
+                const decoded: ApiRecipe[] =
+                    (await response.json()) as ApiRecipe[];
 
                 if (!Array.isArray(decoded)) {
                     alert(genericFailMessage);
@@ -35,8 +37,18 @@ export default function AllRecipesContextProvider({
 
                 const recipesObject: Record<string, Recipe> = {};
 
-                decoded.forEach((recipe: Recipe) => {
-                    recipesObject[recipe.uuid] = recipe;
+                decoded.forEach((recipe: ApiRecipe) => {
+                    recipesObject[recipe.uuid] = {
+                        uuid: recipe.uuid,
+                        name: recipe.name,
+                        description: recipe.description,
+                        difficulty: recipe.difficulty as RecipeDifficulty,
+                        prepTimeMin: recipe.prep_time,
+                        cookTimeMin: recipe.cook_time,
+                        ingredients: recipe.ingredients,
+                        instructions: recipe.instructions,
+                        note: recipe.notes,
+                    };
                 });
 
                 setRecipes(recipesObject);

@@ -1,19 +1,19 @@
 import { RequestHandler } from 'express';
 import { openDb } from '../utils/openDb';
 
-interface Recipe {
+export interface ApiRecipe {
     uuid: string;
     name: string;
     description: string;
     difficulty: string;
     prep_time: number;
     cook_time: number;
-    ingredients: Ingredient[];
+    ingredients: ApiIngredient[];
     instructions: string[];
     notes: string;
 }
 
-interface Ingredient {
+interface ApiIngredient {
     name: string;
     quantity: number;
     unit?: string;
@@ -21,12 +21,12 @@ interface Ingredient {
 
 // The Intermediate interfaces represent the data in the intermediate phase, when it's
 // been only partially transformed.
-interface IntermediateRecipe extends Omit<Recipe, 'instructions'> {
+interface IntermediateRecipe extends Omit<ApiRecipe, 'instructions'> {
     instructions: { text: string; step_number: number }[];
     ingredients: IntermediateIngredient[];
 }
 
-interface IntermediateIngredient extends Ingredient {
+interface IntermediateIngredient extends ApiIngredient {
     order: number;
 }
 
@@ -107,7 +107,7 @@ const getRecipes: RequestHandler = async (req, res) => {
             }
         });
 
-        const finalRecipes: Recipe[] = Array.from(recipeMap.values()).map(
+        const finalRecipes: ApiRecipe[] = Array.from(recipeMap.values()).map(
             convertIntermediateToFinalRecipe,
         );
 
@@ -119,7 +119,9 @@ const getRecipes: RequestHandler = async (req, res) => {
     }
 };
 
-function convertIntermediateToFinalRecipe(recipe: IntermediateRecipe): Recipe {
+function convertIntermediateToFinalRecipe(
+    recipe: IntermediateRecipe,
+): ApiRecipe {
     const finalInstructions = recipe.instructions
         .sort((a, b) => a.step_number - b.step_number)
         .map((instruction) => instruction.text);
