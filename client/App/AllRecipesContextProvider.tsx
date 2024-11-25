@@ -1,7 +1,9 @@
 import { createContext, ReactNode, useMemo, useState } from 'react';
-import { Recipe } from './types';
+import { Recipe, RecipeDifficulty } from './types';
 import useInitialSetup from '../utils/useInitialSetup';
 import serverUrl from './config/serverUrl';
+import { PostRecipesBody } from '../../server/routes/postRecipes';
+import { ApiRecipe } from '../../server/routes/getRecipes';
 
 export default function AllRecipesContextProvider({
     children,
@@ -21,7 +23,8 @@ export default function AllRecipesContextProvider({
                     return;
                 }
 
-                const decoded: unknown = await response.json();
+                const decoded: ApiRecipe[] =
+                    (await response.json()) as ApiRecipe[];
 
                 if (!Array.isArray(decoded)) {
                     alert(genericFailMessage);
@@ -34,8 +37,18 @@ export default function AllRecipesContextProvider({
 
                 const recipesObject: Record<string, Recipe> = {};
 
-                decoded.forEach((recipe: Recipe) => {
-                    recipesObject[recipe.uuid] = recipe;
+                decoded.forEach((recipe: ApiRecipe) => {
+                    recipesObject[recipe.uuid] = {
+                        uuid: recipe.uuid,
+                        name: recipe.name,
+                        description: recipe.description,
+                        difficulty: recipe.difficulty as RecipeDifficulty,
+                        prepTimeMin: recipe.prep_time,
+                        cookTimeMin: recipe.cook_time,
+                        ingredients: recipe.ingredients,
+                        instructions: recipe.instructions,
+                        note: recipe.notes,
+                    };
                 });
 
                 setRecipes(recipesObject);
@@ -48,8 +61,53 @@ export default function AllRecipesContextProvider({
     });
 
     const contextValue = useMemo(() => {
+        const createRecipe: CreateRecipeFunction = async (
+            requestBody,
+            options,
+        ) => {
+            const result = await fetch(`${serverUrl}/recipes`, {
+                method: 'POST',
+                body: JSON.stringify(requestBody),
+                headers: [['Content-Type', 'application/json']],
+            });
+
+            if (result.ok) {
+                const json: unknown = await result.json();
+                if (
+                    typeof json !== 'object' ||
+                    json === null ||
+                    !('uuid' in json) ||
+                    typeof json.uuid !== 'string'
+                ) {
+                    throw new Error("Response didn't include uuid");
+                }
+
+                const uuid = json.uuid;
+
+                setRecipes((prevState) => ({
+                    ...prevState,
+                    [uuid]: {
+                        uuid,
+                        name: requestBody.name,
+                        description: requestBody.description,
+                        difficulty: requestBody.difficulty,
+                        prepTimeMin: requestBody.prep_time,
+                        cookTimeMin: requestBody.cook_time,
+                        ingredients: requestBody.ingredients,
+                        instructions: requestBody.instructions,
+                        note: requestBody.notes,
+                    },
+                }));
+
+                options?.onSuccess?.();
+            } else {
+                options?.onError?.();
+            }
+        };
+
         return {
             recipes,
+            createRecipe,
         };
     }, [recipes]);
 
@@ -60,10 +118,17 @@ export default function AllRecipesContextProvider({
     );
 }
 
+type CreateRecipeFunction = (
+    recipe: PostRecipesBody,
+    options?: { onSuccess?: () => void; onError?: () => void },
+) => void;
+
 interface AllRecipesContextValue {
     recipes: Record<string, Recipe>;
+    createRecipe: CreateRecipeFunction;
 }
 
 export const AllRecipesContext = createContext<AllRecipesContextValue>({
     recipes: {},
+    createRecipe: () => {},
 });
