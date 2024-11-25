@@ -71,18 +71,25 @@ RecipeSearchPage
 */
 
 export default function RecipeSearchPage() {
-    // const { selectedRecipes, setSelectedRecipeUuids } = useContext(
-    //     SelectedRecipesContext,
-    // );
+    const filterRecipe = (recipe: Recipe, appliedFilters: AppliedFilters) => {
+        for (const applied of Object.values(appliedFilters)) {
+            if (
+                !applied.filter.recipeMeetsCriterion(recipe, applied.criterion)
+            ) {
+                return false;
+            }
+        }
+        return true;
+    };
 
     const { recipes } = useContext(AllRecipesContext);
     const AFState = useState<AppliedFilters>({});
-    const FRState = useState<Recipe[]>(Object.values(recipes));
     const AFValue: AppliedFiltersContextValue = {
         appliedFilters: AFState[0],
         setAppliedFilters: AFState[1],
-        filteredRecipes: FRState[0],
-        setFilteredRecipes: FRState[1],
+        filteredRecipes: Object.values(recipes).filter((recipe) =>
+            filterRecipe(recipe, AFState[0]),
+        ),
     };
 
     return (
@@ -152,35 +159,44 @@ function SearchForm() {
 }
 
 function SearchBar() {
-    const { recipes } = useContext(AllRecipesContext);
     const [searchQuery, setSearchQuery] = useState('');
-    const { appliedFilters, filteredRecipes, setFilteredRecipes } = useContext(
+    const { appliedFilters, setAppliedFilters } = useContext(
         AppliedFiltersContext,
     );
-    const filterRecipes = (recipe: Recipe) => {
-        for (const applied of Object.values(appliedFilters)) {
-            if (
-                !applied.filter.recipeMeetsCriterion(recipe, applied.criterion)
-            ) {
-                return false;
-            }
-        }
-        return true;
-    };
     const handleClick = () => {
-        if (searchQuery === '') {
-            setFilteredRecipes(Object.values(recipes).filter(filterRecipes));
-            console.log(
-                'Filtered recipes: ',
-                Object.values(recipes).filter(filterRecipes),
-            );
+        if (!searchQuery || searchQuery.trim() === '') {
+            setSearchQuery('');
+            return;
         }
-        setFilteredRecipes(
-            Object.values(filteredRecipes).filter((recipe) =>
-                recipe.name.toLowerCase().includes(searchQuery.toLowerCase()),
-            ),
-        );
+
+        const filt = {
+            name: 'Includes',
+            value: 'search',
+            onlyOneFilterAtATime: false,
+            criteria: [
+                {
+                    name: `"${searchQuery}"`,
+                    value: 'sq:' + searchQuery,
+                },
+            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                return recipe.name
+                    .toLowerCase()
+                    .includes(criterion.value.slice(3).toLowerCase());
+            },
+        } as Filter;
+
+        const newFilters = { ...appliedFilters };
+        newFilters[
+            filt.onlyOneFilterAtATime ? filt.value : filt.criteria[0].value
+        ] = {
+            filter: filt,
+            criterion: filt.criteria[0],
+        };
+        setAppliedFilters(newFilters);
+
         console.log('Search query: ', searchQuery);
+        setSearchQuery('');
     };
 
     return (
@@ -317,22 +333,11 @@ function Filters() {
         },
     };
 
-    const { recipes } = useContext(AllRecipesContext);
     const [selectedFilter, setSelectedFilter] = useState('none');
     const [selectedCriterion, setSelectedCriterion] = useState('none');
-    const { appliedFilters, setAppliedFilters, setFilteredRecipes } =
-        useContext(AppliedFiltersContext);
-
-    const filterRecipes = (recipe: Recipe) => {
-        for (const applied of Object.values(appliedFilters)) {
-            if (
-                !applied.filter.recipeMeetsCriterion(recipe, applied.criterion)
-            ) {
-                return false;
-            }
-        }
-        return true;
-    };
+    const { appliedFilters, setAppliedFilters } = useContext(
+        AppliedFiltersContext,
+    );
 
     const applyFilter = () => {
         console.log('Applying filter: ', selectedFilter, selectedCriterion);
@@ -362,19 +367,16 @@ function Filters() {
             criterion: crit,
         };
         setAppliedFilters(newFilters);
-        console.log('New filters set: ', newFilters);
-    };
-
-    const fixThis = () => {
-        setFilteredRecipes(Object.values(recipes).filter(filterRecipes));
-        console.log(
-            'Filtered recipes: ',
-            Object.values(recipes).filter(filterRecipes),
-        );
     };
 
     return (
-        <Grid2 id="Filters" container spacing={4} size={6}>
+        <Grid2
+            id="Filters"
+            container
+            spacing={4}
+            size={6}
+            alignItems={'center'}
+        >
             <FilterByDropdown
                 filters={filters}
                 selectedFilter={selectedFilter}
@@ -394,7 +396,7 @@ function Filters() {
                     Apply
                 </Button>
             </Grid2>
-            <Button onClick={fixThis}>Debug</Button>
+            {/* <Button onClick={fixThis}>Debug</Button> */}
         </Grid2>
     );
 }
@@ -761,12 +763,12 @@ interface AppliedFiltersContextValue {
     appliedFilters: AppliedFilters;
     setAppliedFilters: Dispatch<SetStateAction<AppliedFilters>>;
     filteredRecipes: Recipe[];
-    setFilteredRecipes: Dispatch<SetStateAction<Recipe[]>>;
+    // setFilteredRecipes: Dispatch<SetStateAction<Recipe[]>>;
 }
 
 const AppliedFiltersContext = createContext<AppliedFiltersContextValue>({
     appliedFilters: {},
     setAppliedFilters: () => null,
     filteredRecipes: [],
-    setFilteredRecipes: () => null,
+    // setFilteredRecipes: () => null,
 });
