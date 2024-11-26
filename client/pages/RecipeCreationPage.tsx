@@ -50,17 +50,29 @@ function RecipeCreationForm({
     const [prepTime, setPrepTime] = useState<number>(30);
     const [cookTime, setCookTime] = useState<number>(30);
     const [difficulty, setDifficulty] = useState<RecipeDifficulty>('Easy');
-    const [ingredients, setIngredients] = useState<string[]>(['']); // Start with one ingredient input
+    const [ingredients, setIngredients] = useState<
+        { name: string; measurement: number; unit: string }[]
+    >([{ name: '', measurement: 1, unit: '' }]); // Start with one ingredient input
 
     // Add a new ingredient input
     const addIngredient = () => {
-        setIngredients([...ingredients, '']);
+        setIngredients([
+            ...ingredients,
+            { name: '', measurement: 1, unit: '' },
+        ]);
     };
 
     // Handle ingredient input change
-    const handleIngredientChange = (index: number, value: string) => {
+    const handleIngredientChange = (
+        index: number,
+        field: 'name' | 'measurement' | 'unit',
+        value: string | number,
+    ) => {
         const newIngredients = [...ingredients];
-        newIngredients[index] = value;
+        newIngredients[index] = {
+            ...newIngredients[index],
+            [field]: value,
+        };
         setIngredients(newIngredients);
     };
 
@@ -76,9 +88,10 @@ function RecipeCreationForm({
                     difficulty,
                     prep_time: prepTime,
                     cook_time: cookTime,
-                    ingredients: ingredients.map((rawIngredient) => ({
-                        name: rawIngredient,
-                        quantity: 1, // TODO
+                    ingredients: ingredients.map((ingredient) => ({
+                        name: ingredient.name,
+                        quantity: ingredient.measurement, // TODO
+                        unit: ingredient.unit,
                     })),
                     instructions: [], // TODO
                     notes: '', // TODO
@@ -166,11 +179,41 @@ function RecipeCreationForm({
                     <div key={index}>
                         <input
                             type="text"
-                            value={ingredient}
+                            value={ingredient.name}
                             onChange={(e) =>
-                                handleIngredientChange(index, e.target.value)
+                                handleIngredientChange(
+                                    index,
+                                    'name',
+                                    e.target.value,
+                                )
                             }
                             placeholder={`Ingredient ${index + 1}`}
+                            required
+                        />
+                        <input
+                            type="number"
+                            value={ingredient.measurement}
+                            onChange={(e) =>
+                                handleIngredientChange(
+                                    index,
+                                    'measurement',
+                                    e.target.value,
+                                )
+                            }
+                            placeholder={`Amount`}
+                            required
+                        />
+                        <input
+                            type="text"
+                            value={ingredient.unit}
+                            onChange={(e) =>
+                                handleIngredientChange(
+                                    index,
+                                    'unit',
+                                    e.target.value,
+                                )
+                            }
+                            placeholder={`unit`}
                             required
                         />
                     </div>
