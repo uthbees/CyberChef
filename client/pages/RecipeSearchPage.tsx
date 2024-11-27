@@ -84,22 +84,25 @@ export default function RecipeSearchPage() {
 
     const { recipes } = useContext(AllRecipesContext);
     const AFState = useState<AppliedFilters>({});
-    const AFValue: AppliedFiltersContextValue = {
+    const SOState = useState<SortOption>({} as SortOption);
+    const contextValue: SearchPageContextValue = {
         appliedFilters: AFState[0],
         setAppliedFilters: AFState[1],
-        filteredRecipes: Object.values(recipes).filter((recipe) =>
-            filterRecipe(recipe, AFState[0]),
-        ),
+        sortOption: SOState[0],
+        setSortOption: SOState[1],
+        filteredRecipes: Object.values(recipes)
+            .filter((recipe) => filterRecipe(recipe, AFState[0]))
+            .sort(SOState[0].sortFunction),
     };
 
     return (
         <div id="RecipeSearchPage" style={{ margin: 50 }}>
-            <AppliedFiltersContext.Provider value={AFValue}>
+            <SearchPageContext.Provider value={contextValue}>
                 <IntroHeader />
                 <SearchDiv />
                 <SearchResults />
                 {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
-            </AppliedFiltersContext.Provider>
+            </SearchPageContext.Provider>
         </div>
     );
 }
@@ -110,12 +113,13 @@ function IntroHeader() {
             id="IntroHeader"
             sx={{
                 textAlign: 'center',
+                marginBottom: 10,
             }}
         >
-            <h1 style={{ fontFamily: 'Rokkitt' }}>
-                Stub implementation - Recipe Search
-            </h1>
-            <p style={{ fontFamily: 'Montserrat' }}>Optional text</p>
+            <h1 style={{ fontFamily: 'Rokkitt' }}>Recipe Search Page</h1>
+            <p style={{ fontFamily: 'Montserrat' }}>
+                Find your next great meal!
+            </p>
         </Box>
     );
 }
@@ -159,9 +163,7 @@ function SearchForm() {
 
 function SearchBar() {
     const [searchQuery, setSearchQuery] = useState('');
-    const { appliedFilters, setAppliedFilters } = useContext(
-        AppliedFiltersContext,
-    );
+    const { appliedFilters, setAppliedFilters } = useContext(SearchPageContext);
     const handleClick = () => {
         if (!searchQuery || searchQuery.trim() === '') {
             setSearchQuery('');
@@ -334,9 +336,7 @@ function Filters() {
 
     const [selectedFilter, setSelectedFilter] = useState('none');
     const [selectedCriterion, setSelectedCriterion] = useState('none');
-    const { appliedFilters, setAppliedFilters } = useContext(
-        AppliedFiltersContext,
-    );
+    const { appliedFilters, setAppliedFilters } = useContext(SearchPageContext);
 
     const applyFilter = () => {
         console.log('Applying filter: ', selectedFilter, selectedCriterion);
@@ -493,9 +493,7 @@ function FiltersStrip() {
 }
 
 function ActiveFiltersWrapper() {
-    const { appliedFilters, setAppliedFilters } = useContext(
-        AppliedFiltersContext,
-    );
+    const { appliedFilters, setAppliedFilters } = useContext(SearchPageContext);
 
     const removeFilter = (filter: string) => {
         // remove filter from applied
@@ -558,38 +556,64 @@ function AppliedFilterChip(p: AppliedFilterFlierProps) {
 }
 
 function SortByDropdown() {
+    const foo = { Easy: 1, Intermediate: 2, Expert: 3 }; // as { [value: RecipeDifficulty]: number };
+    const sortOptions: SortOptions = {
+        alph: {
+            name: 'Alphabetical',
+            value: 'alph',
+            sortFunction: (a, b) => a.name.localeCompare(b.name),
+        },
+        diff: {
+            name: 'Difficulty',
+            value: 'diff',
+            sortFunction: (a, b) => foo[a.difficulty] - foo[b.difficulty],
+        },
+        time: {
+            name: 'Time',
+            value: 'time',
+            sortFunction: (a, b) =>
+                a.prepTimeMin + a.cookTimeMin - (b.prepTimeMin + b.cookTimeMin),
+        },
+        rate: {
+            name: 'Rating',
+            value: 'rate',
+            sortFunction: () => 0, // TODO: Implement
+        },
+    };
+
     const [thisValue, setThisValue] = useState('');
-    const handleChange = (event: SelectChangeEvent) => {
-        setThisValue(event.target.value);
+    const { setSortOption } = useContext(SearchPageContext);
+    const handleChange = (e: SelectChangeEvent) => {
+        setSortOption(sortOptions[e.target.value]);
+        setThisValue(e.target.value);
     };
     const thisName = 'Sort by...';
 
     return (
-        <Box
-            id="SortByDropdown"
-            sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}
-        >
-            <FormControl fullWidth size="small">
-                <InputLabel>{thisName}</InputLabel>
-                <Select
-                    id="criteria-dropdown"
-                    value={thisValue}
-                    onChange={handleChange}
-                    label={thisName}
-                >
-                    <MenuItem selected>Sort by...</MenuItem>
-                    <MenuItem>Alphabetical</MenuItem>
-                    <MenuItem>Difficulty</MenuItem>
-                    <MenuItem>Time</MenuItem>
-                    <MenuItem>Rating (N/A)</MenuItem>
-                </Select>
-            </FormControl>
-        </Box>
+        <Grid2 id="SortByDropdown" size={2}>
+            <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
+                <FormControl fullWidth size="small">
+                    <InputLabel>{thisName}</InputLabel>
+                    <Select
+                        id="sort-by-dropdown"
+                        value={thisValue}
+                        onChange={handleChange}
+                        label={thisName}
+                    >
+                        {Object.values(sortOptions).map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+        </Grid2>
     );
 }
 
 function SearchResults() {
-    const { filteredRecipes } = useContext(AppliedFiltersContext);
+    const { filteredRecipes } = useContext(SearchPageContext);
 
     return (
         <Grid2
@@ -707,6 +731,16 @@ interface AppliedFilters {
     [value: string]: AppliedFilter;
 }
 
+interface SortOption {
+    name: string;
+    value: string;
+    sortFunction: (a: Recipe, b: Recipe) => number;
+}
+
+interface SortOptions {
+    [value: string]: SortOption;
+}
+
 interface AppliedFilterFlierProps {
     appliedFilters: AppliedFilters;
     filter: string;
@@ -729,14 +763,18 @@ interface CriteriaDropdownProps {
 ----- APPLIED FILTERS CONTEXT -----
 */
 
-interface AppliedFiltersContextValue {
+interface SearchPageContextValue {
     appliedFilters: AppliedFilters;
     setAppliedFilters: Dispatch<SetStateAction<AppliedFilters>>;
+    sortOption: SortOption;
+    setSortOption: Dispatch<SetStateAction<SortOption>>;
     filteredRecipes: Recipe[];
 }
 
-const AppliedFiltersContext = createContext<AppliedFiltersContextValue>({
+const SearchPageContext = createContext<SearchPageContextValue>({
     appliedFilters: {},
     setAppliedFilters: () => null,
+    sortOption: { name: '', value: '', sortFunction: () => 0 },
+    setSortOption: () => null,
     filteredRecipes: [],
 });
