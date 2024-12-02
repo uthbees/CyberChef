@@ -25,6 +25,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
+import { RecipeDialog } from 'client/pages/dialog';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { Recipe } from '../App/types';
 
@@ -101,6 +102,7 @@ export default function RecipeSearchPage() {
                 <IntroHeader />
                 <SearchDiv />
                 <SearchResults />
+
                 {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
             </SearchPageContext.Provider>
         </div>
@@ -691,12 +693,32 @@ function AddToShoppingListButton(p: { recipe: Recipe }) {
 
     let recipeIsIncluded = selectedRecipes.includes(p.recipe);
 
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const handleOpenDialog = () => setIsDialogOpen(true);
+    const handleCloseDialog = () => setIsDialogOpen(false);
+
     return (
         <Fab
             color={recipeIsIncluded ? 'warning' : 'primary'}
             onClick={() => handleClick(p.recipe)}
         >
             {recipeIsIncluded ? <RemoveIcon /> : <AddIcon />}
+            <div>
+                <h1>Recipe Search</h1>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenDialog}
+                >
+                    Show Recipe
+                </Button>
+                <RecipeDialog
+                    open={isDialogOpen}
+                    onClose={handleCloseDialog}
+                    recipe={selectedRecipes[0]}
+                />
+            </div>
         </Fab>
     );
 }
