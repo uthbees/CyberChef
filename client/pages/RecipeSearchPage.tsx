@@ -575,7 +575,7 @@ function SortByDropdown() {
                 a.prepTimeMin + a.cookTimeMin - (b.prepTimeMin + b.cookTimeMin),
         },
         rate: {
-            name: 'Rating',
+            name: 'Rating (N/A)',
             value: 'rate',
             sortFunction: () => 0, // TODO: Implement
         },
