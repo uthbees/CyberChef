@@ -17,9 +17,12 @@ import {
     IconButton,
     TextField,
     Chip,
+    Fab,
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
@@ -68,29 +71,38 @@ RecipeSearchPage
 */
 
 export default function RecipeSearchPage() {
-    // const { selectedRecipes, setSelectedRecipeUuids } = useContext(
-    //     SelectedRecipesContext,
-    // );
+    const filterRecipe = (recipe: Recipe, appliedFilters: AppliedFilters) => {
+        for (const applied of Object.values(appliedFilters)) {
+            if (
+                !applied.filter.recipeMeetsCriterion(recipe, applied.criterion)
+            ) {
+                return false;
+            }
+        }
+        return true;
+    };
 
-    // const { recipes } = useContext(AllRecipesContext);
-
+    const { recipes } = useContext(AllRecipesContext);
     const AFState = useState<AppliedFilters>({});
-    const FRState = useState<Recipe[]>([]);
-    const AFValue: AppliedFiltersContextValue = {
+    const SOState = useState<SortOption>({} as SortOption);
+    const contextValue: SearchPageContextValue = {
         appliedFilters: AFState[0],
         setAppliedFilters: AFState[1],
-        filteredRecipes: FRState[0],
-        setFilteredRecipes: FRState[1],
+        sortOption: SOState[0],
+        setSortOption: SOState[1],
+        filteredRecipes: Object.values(recipes)
+            .filter((recipe) => filterRecipe(recipe, AFState[0]))
+            .sort(SOState[0].sortFunction),
     };
 
     return (
-        <div>
-            <AppliedFiltersContext.Provider value={AFValue}>
+        <div id="RecipeSearchPage" style={{ margin: 50 }}>
+            <SearchPageContext.Provider value={contextValue}>
                 <IntroHeader />
                 <SearchDiv />
                 <SearchResults />
                 {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
-            </AppliedFiltersContext.Provider>
+            </SearchPageContext.Provider>
         </div>
     );
 }
@@ -98,15 +110,16 @@ export default function RecipeSearchPage() {
 function IntroHeader() {
     return (
         <Box
+            id="IntroHeader"
             sx={{
-                // margin: 'auto',
                 textAlign: 'center',
+                marginBottom: 10,
             }}
         >
-            <h1 style={{ fontFamily: 'Rokkitt' }}>
-                Stub implementation - Recipe Search
-            </h1>
-            <p style={{ fontFamily: 'Montserrat' }}>Optional text</p>
+            <h1 style={{ fontFamily: 'Rokkitt' }}>Recipe Search Page</h1>
+            <p style={{ fontFamily: 'Montserrat' }}>
+                Find your next great meal!
+            </p>
         </Box>
     );
 }
@@ -114,12 +127,14 @@ function IntroHeader() {
 function SearchDiv() {
     return (
         <Box
+            id="SearchDiv"
             sx={{
                 p: 2,
-                bgcolor: '#eee',
+                bgcolor: '#E4E2DC',
                 border: '5px solid #201C1C',
-                borderRadius: 4,
+                borderRadius: 5,
                 margin: 'auto',
+                padding: 0,
             }}
             maxWidth={1000}
         >
@@ -131,8 +146,14 @@ function SearchDiv() {
 
 function SearchForm() {
     return (
-        <form id="search-form" action="/my-handling-form-page" method="post">
-            <Grid2 container spacing={4} marginBottom={4}>
+        <form id="SearchForm" action="/my-handling-form-page" method="post">
+            <Grid2
+                container
+                spacing={4}
+                marginBottom={1}
+                padding={2}
+                alignItems={'center'}
+            >
                 <SearchBar />
                 <Filters />
             </Grid2>
@@ -141,14 +162,63 @@ function SearchForm() {
 }
 
 function SearchBar() {
+    const [searchQuery, setSearchQuery] = useState('');
+    const { appliedFilters, setAppliedFilters } = useContext(SearchPageContext);
+    const handleClick = () => {
+        if (!searchQuery || searchQuery.trim() === '') {
+            setSearchQuery('');
+            return;
+        }
+
+        const sq = 'sq:';
+        const filt = {
+            name: 'Includes',
+            value: 'search',
+            onlyOneCritAtATime: false,
+            criteria: [
+                {
+                    name: `"${searchQuery}"`,
+                    value: sq + searchQuery,
+                },
+            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                return recipe.name
+                    .toLowerCase()
+                    .includes(criterion.value.slice(sq.length).toLowerCase());
+            },
+        } as Filter;
+
+        const newFilters = { ...appliedFilters };
+        newFilters[
+            filt.onlyOneCritAtATime ? filt.value : filt.criteria[0].value
+        ] = {
+            filter: filt,
+            criterion: filt.criteria[0],
+        };
+        setAppliedFilters(newFilters);
+
+        console.log('Search query: ', searchQuery);
+        setSearchQuery('');
+    };
+
     return (
-        <Grid2 container spacing={4} size={6}>
-            <SearchInput />
+        <Grid2
+            id="SearchBar"
+            container
+            spacing={4}
+            size={6}
+            alignItems={'center'}
+        >
+            <SearchInput
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
             <Grid2 size={4}>
                 <Button
                     endIcon={<SearchIcon />}
                     variant="contained"
                     id="search-button"
+                    onClick={handleClick}
                 >
                     Search
                 </Button>
@@ -157,35 +227,41 @@ function SearchBar() {
     );
 }
 
-function SearchInput() {
-    const [searchQuery, setSearchQuery] = useState('');
+function SearchInput(p: {
+    searchQuery: string;
+    setSearchQuery: (value: string) => void;
+}) {
     const handleChange = (
         e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
     ) => {
-        setSearchQuery(e.target.value);
+        p.setSearchQuery(e.target.value);
     };
-    const handleClick = () => {
-        setSearchQuery('');
+    const handleXClick = () => {
+        p.setSearchQuery('');
     };
     return (
-        <Grid2 size={8}>
+        <Grid2 id="SearchInput" size={8} alignItems={'center'}>
             <TextField
+                sx={{ bgcolor: '#F4F2EC', width: '100%' }}
                 label="Search for recipes..."
                 variant="outlined"
                 name="search-input"
                 id="search-input"
-                value={searchQuery}
+                value={p.searchQuery}
                 onChange={(e) => handleChange(e)}
             />
-            <ClearXButton onClick={handleClick} />
+            <ClearXButton onClick={handleXClick} />
         </Grid2>
     );
 }
 
 function ClearXButton({ onClick }: { onClick: () => void }) {
-    //variant="text" id="clear-x-button"
     return (
-        <IconButton onClick={onClick} size="small">
+        <IconButton
+            sx={{ marginTop: 1.25, marginLeft: -4.5 }}
+            onClick={onClick}
+            size="small"
+        >
             <ClearIcon />
         </IconButton>
     );
@@ -193,57 +269,77 @@ function ClearXButton({ onClick }: { onClick: () => void }) {
 
 function Filters() {
     const filters: Filters = {
-        tags: {
-            name: 'Tag',
-            value: 'tags',
-            onlyOneFilterAtATime: false,
-            criteria: [
-                { name: 'Tag1', value: 'tag1' },
-                { name: 'Tag2', value: 'tag2' },
-                { name: 'Tag3', value: 'tag3' },
-            ],
-        },
         diff: {
             name: 'Difficulty',
             value: 'diff',
-            onlyOneFilterAtATime: true,
+            onlyOneCritAtATime: true,
             criteria: [
-                { name: 'Easy', value: 'easy' },
-                { name: 'Intermediate', value: 'medi' },
-                { name: 'Expert', value: 'hard' },
+                { name: 'Easy', value: 'Easy' },
+                { name: 'Intermediate', value: 'Intermediate' },
+                { name: 'Expert', value: 'Expert' },
             ],
-        },
-        rate: {
-            name: 'Rating',
-            value: 'rate',
-            onlyOneFilterAtATime: true,
-            criteria: [
-                { name: '≥2 stars', value: '2star' },
-                { name: '≥3 stars', value: '3star' },
-                { name: '≥4 stars', value: '4star' },
-                { name: '5 stars', value: '5star' },
-            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                return recipe.difficulty === criterion.value;
+            },
         },
         time: {
             name: 'Total time',
             value: 'time',
-            onlyOneFilterAtATime: true,
+            onlyOneCritAtATime: true,
             criteria: [
-                { name: '≤15 min', value: '15min' },
-                { name: '≤30 min', value: '30min' },
-                { name: '≤1 hr', value: '1hour' },
-                { name: '≤2 hr', value: '2hour' },
+                { name: '≤ 15 min', value: '15' },
+                { name: '≤ 30 min', value: '30' },
+                { name: '≤ 1 hr', value: '60' },
+                { name: '≤ 2 hr', value: '120' },
             ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                return (
+                    recipe.prepTimeMin + recipe.cookTimeMin <=
+                    Number(criterion.value)
+                );
+            },
+        },
+        tags: {
+            name: 'Tag (N/A)',
+            value: 'tags',
+            onlyOneCritAtATime: false,
+            criteria: [
+                { name: 'Tag1', value: 'Tag1' },
+                { name: 'Tag2', value: 'Tag2' },
+                { name: 'Tag3', value: 'Tag3' },
+            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                // TODO: Implement
+                if (recipe && criterion) {
+                }
+                return true;
+            },
+        },
+        rate: {
+            name: 'Rating (N/A)',
+            value: 'rate',
+            onlyOneCritAtATime: true,
+            criteria: [
+                { name: '≥2 stars', value: '2' },
+                { name: '≥3 stars', value: '3' },
+                { name: '≥4 stars', value: '4' },
+                { name: '5 stars', value: '5' },
+            ],
+            recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => {
+                // TODO: Implement
+                if (recipe && criterion) {
+                }
+                return true;
+            },
         },
     };
 
     const [selectedFilter, setSelectedFilter] = useState('none');
     const [selectedCriterion, setSelectedCriterion] = useState('none');
-    const { appliedFilters, setAppliedFilters } = useContext(
-        AppliedFiltersContext,
-    );
+    const { appliedFilters, setAppliedFilters } = useContext(SearchPageContext);
 
     const applyFilter = () => {
+        console.log('Applying filter: ', selectedFilter, selectedCriterion);
         if (
             // Cases to prevent applying a filter
             selectedFilter === 'none' ||
@@ -262,7 +358,7 @@ function Filters() {
             return;
         }
         newFilters[
-            filters[selectedFilter].onlyOneFilterAtATime
+            filters[selectedFilter].onlyOneCritAtATime
                 ? selectedFilter
                 : selectedCriterion
         ] = {
@@ -273,7 +369,13 @@ function Filters() {
     };
 
     return (
-        <Grid2 container spacing={4} size={6}>
+        <Grid2
+            id="Filters"
+            container
+            spacing={4}
+            size={6}
+            alignItems={'center'}
+        >
             <FilterByDropdown
                 filters={filters}
                 selectedFilter={selectedFilter}
@@ -289,9 +391,8 @@ function Filters() {
                     variant="contained"
                     onClick={applyFilter}
                     endIcon={<FilterAltIcon />}
-                    size="small"
                 >
-                    Apply Filter
+                    Apply
                 </Button>
             </Grid2>
         </Grid2>
@@ -307,7 +408,7 @@ function FilterByDropdown(p: FilterByDropdownProps) {
     const thisName = 'Filter by...';
 
     return (
-        <Grid2 size={4}>
+        <Grid2 id="FilterByDropdown" size={4}>
             <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
                 <FormControl fullWidth>
                     <InputLabel>{thisName}</InputLabel>
@@ -317,9 +418,6 @@ function FilterByDropdown(p: FilterByDropdownProps) {
                         onChange={handleChange}
                         label={thisName}
                     >
-                        {/* <option selected key="none" value="none">
-                                Filter by...
-                            </option> */}
                         {Object.keys(p.filters).map(
                             (filter) =>
                                 filter != 'none' && (
@@ -352,7 +450,7 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
     const thisName = 'Criteria...';
 
     return (
-        <Grid2 size={4}>
+        <Grid2 id="CriteriaDropdown" size={4}>
             <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
                 <FormControl fullWidth disabled={!p.activeFilter}>
                     <InputLabel>{thisName}</InputLabel>
@@ -362,9 +460,6 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
                         onChange={handleChange}
                         label={thisName}
                     >
-                        {/* <option key="none" value="none">
-                                Select criteria...
-                            </option> */}
                         {availableOptions.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
                                 {option.name}
@@ -379,8 +474,17 @@ function CriteriaDropdown(p: CriteriaDropdownProps) {
 
 function FiltersStrip() {
     return (
-        <Box sx={{ maxWidth: 'auto' }}>
-            <Grid2 container spacing={4}>
+        <Box
+            id="FiltersStrip"
+            sx={{
+                maxWidth: 'auto',
+                margin: 'auto',
+                bgcolor: '#D4D2CC',
+                padding: 2,
+                borderRadius: 4,
+            }}
+        >
+            <Grid2 container spacing={4} alignItems={'center'}>
                 <ActiveFiltersWrapper />
                 <SortByDropdown />
             </Grid2>
@@ -389,9 +493,7 @@ function FiltersStrip() {
 }
 
 function ActiveFiltersWrapper() {
-    const { appliedFilters, setAppliedFilters } = useContext(
-        AppliedFiltersContext,
-    );
+    const { appliedFilters, setAppliedFilters } = useContext(SearchPageContext);
 
     const removeFilter = (filter: string) => {
         // remove filter from applied
@@ -402,35 +504,30 @@ function ActiveFiltersWrapper() {
 
     if (Object.keys(appliedFilters).length === 0) {
         return (
-            <Grid2 size={10}>
-                <p style={{ fontFamily: 'Montserrat' }}>No Active Filters</p>
+            <Grid2 id="ActiveFiltersWrapper" size={10}>
+                <p style={{ fontFamily: 'Montserrat', margin: 'auto' }}>
+                    No Active Filters
+                </p>
             </Grid2>
         );
     }
 
     return (
-        <Grid2
-            container
-            spacing={0}
-            size={10}
-            // sx={{
-            //     '--Grid-borderWidth': '1px',
-            //     borderTop: 'var(--Grid-borderWidth) solid',
-            //     borderLeft: 'var(--Grid-borderWidth) solid',
-            //     borderColor: 'divider',
-            //     '& > div': {
-            //         borderRight: 'var(--Grid-borderWidth) solid',
-            //         borderBottom: 'var(--Grid-borderWidth) solid',
-            //         borderColor: 'divider',
-            //     },
-            // }}
-        >
+        <Grid2 id="ActiveFiltersWrapper" container spacing={0} size={10}>
             <Grid2 size={2}>
-                <p style={{ fontFamily: 'Montserrat' }}>Active Filters:</p>
+                <p
+                    style={{
+                        fontFamily: 'Montserrat',
+                        margin: 'auto',
+                        marginTop: 6,
+                    }}
+                >
+                    Active Filters:
+                </p>
             </Grid2>
             <Grid2 container size={10}>
                 {Object.keys(appliedFilters).map((filter) => (
-                    <AppliedFilterFlier
+                    <AppliedFilterChip
                         key={appliedFilters[filter].filter.value}
                         filter={filter}
                         appliedFilters={appliedFilters}
@@ -442,15 +539,15 @@ function ActiveFiltersWrapper() {
     );
 }
 
-function AppliedFilterFlier(p: AppliedFilterFlierProps) {
+function AppliedFilterChip(p: AppliedFilterFlierProps) {
     const yuh = p.appliedFilters[p.filter];
     const handleClick = () => {
         p.removeFilter(p.filter);
     };
     return (
-        <Grid2 spacing={0} margin={0} padding={0}>
+        <Grid2 margin={0} padding={0}>
             <Chip
-                sx={{ margin: 'auto' }}
+                sx={{ margin: 'auto', marginRight: 1 }}
                 label={`${yuh.filter.name}: ${yuh.criterion.name}`}
                 onDelete={handleClick}
             ></Chip>
@@ -459,41 +556,80 @@ function AppliedFilterFlier(p: AppliedFilterFlierProps) {
 }
 
 function SortByDropdown() {
+    const foo = { Easy: 1, Intermediate: 2, Expert: 3 }; // as { [value: RecipeDifficulty]: number };
+    const sortOptions: SortOptions = {
+        alph: {
+            name: 'Alphabetical',
+            value: 'alph',
+            sortFunction: (a, b) => a.name.localeCompare(b.name),
+        },
+        diff: {
+            name: 'Difficulty',
+            value: 'diff',
+            sortFunction: (a, b) => foo[a.difficulty] - foo[b.difficulty],
+        },
+        time: {
+            name: 'Time',
+            value: 'time',
+            sortFunction: (a, b) =>
+                a.prepTimeMin + a.cookTimeMin - (b.prepTimeMin + b.cookTimeMin),
+        },
+        rate: {
+            name: 'Rating',
+            value: 'rate',
+            sortFunction: () => 0, // TODO: Implement
+        },
+    };
+
     const [thisValue, setThisValue] = useState('');
-    const handleChange = (event: SelectChangeEvent) => {
-        setThisValue(event.target.value);
+    const { setSortOption } = useContext(SearchPageContext);
+    const handleChange = (e: SelectChangeEvent) => {
+        setSortOption(sortOptions[e.target.value]);
+        setThisValue(e.target.value);
     };
     const thisName = 'Sort by...';
 
     return (
-        <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
-            <FormControl fullWidth size="small">
-                <InputLabel>{thisName}</InputLabel>
-                <Select
-                    id="criteria-dropdown"
-                    value={thisValue}
-                    onChange={handleChange}
-                    label={thisName}
-                >
-                    <MenuItem selected>Sort by...</MenuItem>
-                    <MenuItem>Alphabetical</MenuItem>
-                    <MenuItem>Difficulty</MenuItem>
-                    <MenuItem>Rating</MenuItem>
-                    <MenuItem>Time</MenuItem>
-                </Select>
-            </FormControl>
-        </Box>
+        <Grid2 id="SortByDropdown" size={2}>
+            <Box sx={{ minWidth: 120, maxWidth: 200, bgcolor: '#F4F2EC' }}>
+                <FormControl fullWidth size="small">
+                    <InputLabel>{thisName}</InputLabel>
+                    <Select
+                        id="sort-by-dropdown"
+                        value={thisValue}
+                        onChange={handleChange}
+                        label={thisName}
+                    >
+                        {Object.values(sortOptions).map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+        </Grid2>
     );
 }
 
 function SearchResults() {
-    const {
-        recipes, //setSelectedRecipes
-    } = useContext(AllRecipesContext);
+    const { filteredRecipes } = useContext(SearchPageContext);
 
     return (
-        <Grid2 container spacing={4}>
-            {Object.values(recipes).map((r, index) => (
+        <Grid2
+            container
+            spacing={6}
+            sx={{
+                maxWidth: '1000px',
+                margin: 'auto',
+                marginTop: 6,
+                border: '5px solid #201C1C',
+                borderRadius: 5,
+                padding: 3,
+                bgcolor: '#E8C3A2',
+            }}
+        >
+            {Object.values(filteredRecipes).map((r, index) => (
                 <RecipeCard key={index} index={index} recipe={r} />
             ))}
         </Grid2>
@@ -501,6 +637,7 @@ function SearchResults() {
 }
 
 function RecipeCard(p: { recipe: Recipe; index: number }) {
+    // TODO: Implement tags (restore the commented code below)
     // let tags: string = p.recipe.tags.join(', ');
     // tags = tags.charAt(0).toUpperCase() + tags.slice(1).toLowerCase();
     // const tagCutOff = 18;
@@ -510,12 +647,22 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
 
     return (
         <Grid2 key={p.index} size={4}>
-            {/* <img src="https://placehold.co/200" /> */}
-            <h2>{p.recipe.name}</h2>
-            <p>Difficulty: {p.recipe.difficulty}</p>
-            <p>Total time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
-            {/* <p>Tags: {tags}</p> */}
-            <AddToShoppingListButton recipe={p.recipe} />
+            <Box
+                sx={{
+                    border: '4px solid #BA1F11',
+                    borderRadius: 3,
+                    bgcolor: '#F4F2EC',
+                    fontFamily: 'Montserrat',
+                    paddingX: 2,
+                }}
+            >
+                {/* <img src="https://placehold.co/200" /> */}
+                <h2 style={{ fontFamily: 'Rokkitt' }}>{p.recipe.name}</h2>
+                <p>Difficulty: {p.recipe.difficulty}</p>
+                <p>Time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
+                {/* <p>Tags: {tags}</p> */}
+                <AddToShoppingListButton recipe={p.recipe} />
+            </Box>
         </Grid2>
     );
 }
@@ -539,19 +686,18 @@ function AddToShoppingListButton(p: { recipe: Recipe }) {
             setSelectedRecipeUuids([...mapped, recipe.uuid]);
         }
 
-        chosenMessageInd = 1 - chosenMessageInd;
+        recipeIsIncluded = !recipeIsIncluded;
     };
 
-    const message: string[] = [
-        'Add to Shopping List',
-        'Remove from Shopping List',
-    ];
-    let chosenMessageInd = selectedRecipes.includes(p.recipe) ? 1 : 0;
+    let recipeIsIncluded = selectedRecipes.includes(p.recipe);
 
     return (
-        <Button onClick={() => handleClick(p.recipe)}>
-            {message[chosenMessageInd]}
-        </Button>
+        <Fab
+            color={recipeIsIncluded ? 'warning' : 'primary'}
+            onClick={() => handleClick(p.recipe)}
+        >
+            {recipeIsIncluded ? <RemoveIcon /> : <AddIcon />}
+        </Fab>
     );
 }
 
@@ -567,8 +713,9 @@ interface Criterion {
 interface Filter {
     name: string;
     value: string;
-    onlyOneFilterAtATime: boolean;
+    onlyOneCritAtATime: boolean;
     criteria: Criterion[];
+    recipeMeetsCriterion: (recipe: Recipe, criterion: Criterion) => boolean;
 }
 
 interface Filters {
@@ -582,6 +729,16 @@ interface AppliedFilter {
 
 interface AppliedFilters {
     [value: string]: AppliedFilter;
+}
+
+interface SortOption {
+    name: string;
+    value: string;
+    sortFunction: (a: Recipe, b: Recipe) => number;
+}
+
+interface SortOptions {
+    [value: string]: SortOption;
 }
 
 interface AppliedFilterFlierProps {
@@ -606,16 +763,18 @@ interface CriteriaDropdownProps {
 ----- APPLIED FILTERS CONTEXT -----
 */
 
-interface AppliedFiltersContextValue {
+interface SearchPageContextValue {
     appliedFilters: AppliedFilters;
     setAppliedFilters: Dispatch<SetStateAction<AppliedFilters>>;
+    sortOption: SortOption;
+    setSortOption: Dispatch<SetStateAction<SortOption>>;
     filteredRecipes: Recipe[];
-    setFilteredRecipes: Dispatch<SetStateAction<Recipe[]>>;
 }
 
-const AppliedFiltersContext = createContext<AppliedFiltersContextValue>({
+const SearchPageContext = createContext<SearchPageContextValue>({
     appliedFilters: {},
     setAppliedFilters: () => null,
+    sortOption: { name: '', value: '', sortFunction: () => 0 },
+    setSortOption: () => null,
     filteredRecipes: [],
-    setFilteredRecipes: () => null,
 });

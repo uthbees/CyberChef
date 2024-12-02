@@ -128,13 +128,27 @@ export default function SelectedRecipesContextProvider({
                 });
             }
 
+            const selectedRecipes = savedSelectedRecipes
+                .map((savedSelectedRecipe) => {
+                    const recipe = recipes[savedSelectedRecipe.uuid];
+
+                    if (recipe === undefined) {
+                        return undefined;
+                    }
+
+                    recipe.ingredients.forEach((_, index) => {
+                        recipe.ingredients[index].uiChecked =
+                            savedSelectedRecipe.ingredientCheckedStatuses[
+                                index
+                            ] ?? false;
+                    });
+
+                    return recipe;
+                })
+                .filter((recipe) => recipe !== undefined);
+
             return {
-                selectedRecipes: savedSelectedRecipes
-                    .map(
-                        (savedSelectedRecipe) =>
-                            recipes[savedSelectedRecipe.uuid],
-                    )
-                    .filter((recipe) => recipe !== undefined),
+                selectedRecipes,
                 setSelectedRecipeUuids,
                 setIngredientCheckedStatus,
             };
