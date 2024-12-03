@@ -25,6 +25,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
+import RecipeDialog from './dialog';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { Recipe } from '../App/types';
 
@@ -101,6 +102,7 @@ export default function RecipeSearchPage() {
                 <IntroHeader />
                 <SearchDiv />
                 <SearchResults />
+
                 {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
             </SearchPageContext.Provider>
         </div>
@@ -653,7 +655,7 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
                     borderRadius: 3,
                     bgcolor: '#F4F2EC',
                     fontFamily: 'Montserrat',
-                    paddingX: 2,
+                    paddingX: 3,
                 }}
             >
                 {/* <img src="https://placehold.co/200" /> */}
@@ -661,9 +663,42 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
                 <p>Difficulty: {p.recipe.difficulty}</p>
                 <p>Time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
                 {/* <p>Tags: {tags}</p> */}
-                <AddToShoppingListButton recipe={p.recipe} />
+                <Box mb={2}>
+                    <ShowRecipeButton recipe={p.recipe} />
+                </Box>
+                <Box mb={2}>
+                    <AddToShoppingListButton recipe={p.recipe} />
+                </Box>
             </Box>
         </Grid2>
+    );
+}
+
+function ShowRecipeButton(p: { recipe: Recipe }) {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const handleOpenDialog = () => {
+        setIsDialogOpen(true);
+    };
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+    };
+
+    return (
+        <div>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenDialog}
+            >
+                Show Recipe
+            </Button>
+            <RecipeDialog
+                open={isDialogOpen}
+                onClose={handleCloseDialog}
+                recipe={p.recipe}
+            />
+        </div>
     );
 }
 
