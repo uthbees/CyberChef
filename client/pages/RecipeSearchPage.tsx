@@ -658,17 +658,19 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
                     paddingX: 3,
                 }}
             >
-                {/* <img src="https://placehold.co/200" /> */}
-                <h2 style={{ fontFamily: 'Rokkitt' }}>{p.recipe.name}</h2>
+                <h2
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                    <div style={{ fontFamily: 'Rokkitt' }}>{p.recipe.name}</div>
+                    <AddToShoppingListButton recipe={p.recipe} />
+                </h2>
                 <p>Difficulty: {p.recipe.difficulty}</p>
                 <p>Time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
                 {/* <p>Tags: {tags}</p> */}
                 <Box mb={2}>
                     <ShowRecipeButton recipe={p.recipe} />
                 </Box>
-                <Box mb={2}>
-                    <AddToShoppingListButton recipe={p.recipe} />
-                </Box>
+                <Box mb={2}></Box>
             </Box>
         </Grid2>
     );
@@ -691,7 +693,7 @@ function ShowRecipeButton(p: { recipe: Recipe }) {
                 color="primary"
                 onClick={handleOpenDialog}
             >
-                Show Recipe
+                Show Details
             </Button>
             <RecipeDialog
                 open={isDialogOpen}
@@ -727,12 +729,13 @@ function AddToShoppingListButton(p: { recipe: Recipe }) {
     let recipeIsIncluded = selectedRecipes.includes(p.recipe);
 
     return (
-        <Fab
-            color={recipeIsIncluded ? 'warning' : 'primary'}
+        <IconButton
+            color={recipeIsIncluded ? 'primary' : 'primary'}
             onClick={() => handleClick(p.recipe)}
         >
+            {/*<AddIcon />*/}
             {recipeIsIncluded ? <RemoveIcon /> : <AddIcon />}
-        </Fab>
+        </IconButton>
     );
 }
 
