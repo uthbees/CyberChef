@@ -8,6 +8,8 @@ import {
     DialogContent,
     DialogActions,
     Button,
+    Typography,
+    Breadcrumbs,
 } from '@mui/material';
 
 // interface Recipe {
@@ -27,6 +29,12 @@ interface RecipeDialogProps {
     recipe: Recipe;
 }
 
+function toTitleCase(str: string): string {
+    return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+}
+
 const RecipeDialog: React.FC<RecipeDialogProps> = ({
     open,
     onClose,
@@ -40,21 +48,27 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
         if (recipe.note === '') {
             return (
                 <Dialog open={open} onClose={onClose}>
-                    <DialogTitle>{recipe.name}</DialogTitle>
+                    <DialogTitle>
+                        <Typography variant="h2">
+                            {toTitleCase(recipe.name)}
+                        </Typography>
+                    </DialogTitle>
                     <DialogContent>
-                        <p> prep time:{recipe.prepTimeMin} </p>
-                        <p> cook time:{recipe.cookTimeMin} </p>
-                        <p> Description: {recipe.description}</p>
-                        <p> Difficulty: {recipe.difficulty}</p>
-                        <p>Ingredients:</p>
-                        <ul>
-                            {recipe.ingredients.map((ingredient, index) => (
-                                <li key={index}>
-                                    {ingredient.quantity} {ingredient.unit}{' '}
-                                    {ingredient.name}
-                                </li>
-                            ))}
-                        </ul>
+                        <Typography variant="h5">
+                            <p> Prep time: {recipe.prepTimeMin} Minutes </p>
+                            <p> Cook time: {recipe.cookTimeMin} Minutes </p>
+                            <p> Description: {recipe.description}</p>
+                            <p> Difficulty: {recipe.difficulty}</p>
+                            <p>Ingredients:</p>
+                            <ul>
+                                {recipe.ingredients.map((ingredient, index) => (
+                                    <li key={index}>
+                                        {ingredient.quantity} {ingredient.unit}{' '}
+                                        {ingredient.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        </Typography>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={onClose} color="primary">
@@ -66,8 +80,42 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
         }
         return (
             <Dialog open={open} onClose={onClose}>
-                <DialogTitle>{recipe.name}</DialogTitle>
+                <DialogTitle>
+                    <Typography variant="h2">{recipe.name}</Typography>
+                </DialogTitle>
                 <DialogContent>
+                    <Typography variant="h5">
+                        <p> prep time:{recipe.prepTimeMin} </p>
+                        <p> cook time:{recipe.cookTimeMin} </p>
+                        <p> Description: {recipe.description}</p>
+                        <p> Difficulty: {recipe.difficulty}</p>
+                        <ul>
+                            {recipe.ingredients.map((ingredient, index) => (
+                                <li key={index}>
+                                    {ingredient.quantity} {ingredient.unit}{' '}
+                                    {ingredient.name}
+                                </li>
+                            ))}
+                        </ul>
+                        <p>Additional Notes:</p>
+                        <p>{recipe.note}</p>
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onClose} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+    return (
+        <Dialog open={open} onClose={onClose}>
+            <DialogTitle>
+                <Typography variant="h2">{recipe.name}</Typography>
+            </DialogTitle>
+            <DialogContent>
+                <Typography variant="h5">
                     <p> prep time:{recipe.prepTimeMin} </p>
                     <p> cook time:{recipe.cookTimeMin} </p>
                     <p> Description: {recipe.description}</p>
@@ -81,42 +129,15 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
                             </li>
                         ))}
                     </ul>
+                    <p>Instructions:</p>
+                    <ol>
+                        {recipe.instructions.map((instruction, index) => (
+                            <li key={index}>{instruction}</li>
+                        ))}
+                    </ol>
                     <p>Additional Notes:</p>
                     <p>{recipe.note}</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={onClose} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        );
-    }
-    return (
-        <Dialog open={open} onClose={onClose}>
-            <DialogTitle>{recipe.name}</DialogTitle>
-            <DialogContent>
-                <p> prep time:{recipe.prepTimeMin} </p>
-                <p> cook time:{recipe.cookTimeMin} </p>
-                <p> Description: {recipe.description}</p>
-                <p> Difficulty: {recipe.difficulty}</p>
-                <p>Ingredients:</p>
-                <ul>
-                    {recipe.ingredients.map((ingredient, index) => (
-                        <li key={index}>
-                            {ingredient.quantity} {ingredient.unit}{' '}
-                            {ingredient.name}
-                        </li>
-                    ))}
-                </ul>
-                <p>Instructions:</p>
-                <ol>
-                    {recipe.instructions.map((instruction, index) => (
-                        <li key={index}>{instruction}</li>
-                    ))}
-                </ol>
-                <p>Additional Notes:</p>
-                <p>{recipe.note}</p>
+                </Typography>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} color="primary">
