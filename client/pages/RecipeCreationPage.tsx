@@ -3,14 +3,15 @@ import { PostRecipesBody } from '../../server/routes/postRecipes';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { RecipeDifficulty } from '../App/types';
 import {
+    Button,
     CircularProgress,
     FormControlLabel,
     MenuItem,
     Select,
+    Stack,
     TextField,
     Typography,
 } from '@mui/material';
-import { Description } from '@mui/icons-material';
 
 export default function RecipeCreationPage() {
     const [recipeCreationStatus, setRecipeCreationStatus] =
@@ -115,179 +116,195 @@ function RecipeCreationForm({
         >
             <h2>Create a New Recipe</h2>
 
-            <div>
-                <FormControlLabel
-                    control={
-                        <TextField
-                            type="text"
-                            value={recipeName}
-                            onChange={(e) =>
-                                setRecipeDescription(e.target.value)
-                            }
-                            placeholder="Enter recipe name"
-                            required
-                            InputLabelProps={{ required: false }}
-                        />
-                    }
-                    label="Recipe Name:"
-                    labelPlacement="start"
-                ></FormControlLabel>
-            </div>
-
-            <div>
-                <FormControlLabel
-                    control={
-                        <TextField
-                            type="text"
-                            value={recipeDescription}
-                            onChange={(e) =>
-                                setRecipeDescription(e.target.value)
-                            }
-                            placeholder="Enter recipe description"
-                            required
-                            InputLabelProps={{ required: false }}
-                        />
-                    }
-                    label="Description:"
-                    labelPlacement="start"
-                ></FormControlLabel>
-            </div>
-            <div>
-                <FormControlLabel
-                    control={
-                        <TextField
-                            type="number"
-                            value={prepTime}
-                            onChange={(e) =>
-                                setPrepTime(Number(e.target.value))
-                            }
-                            required
-                            InputLabelProps={{ required: false }}
-                        />
-                    }
-                    label="Prep Time (in minutes):"
-                    labelPlacement="start"
-                ></FormControlLabel>
-            </div>
-
-            <div>
-                <FormControlLabel
-                    control={
-                        <TextField
-                            type="number"
-                            value={cookTime}
-                            onChange={(e) =>
-                                setCookTime(Number(e.target.value))
-                            }
-                            required
-                            InputLabelProps={{ required: false }}
-                        />
-                    }
-                    label="Cook Time (in minutes):"
-                    labelPlacement="start"
-                ></FormControlLabel>
-            </div>
-
-            <div>
-                <FormControlLabel
-                    control={
-                        <Select
-                            value={difficulty}
-                            onChange={(e) => {
-                                if (stringIsRecipeDifficulty(e.target.value)) {
-                                    setDifficulty(e.target.value);
-                                } else {
-                                    alert(
-                                        `Error: ${difficulty} is not a valid difficulty`,
-                                    );
+            <Stack spacing={1}>
+                <div>
+                    <FormControlLabel
+                        control={
+                            <TextField
+                                type="text"
+                                value={recipeName}
+                                onChange={(e) =>
+                                    setRecipeDescription(e.target.value)
                                 }
-                            }}
-                        >
-                            <MenuItem value="Easy">Easy</MenuItem>
-                            <MenuItem value="Intermediate">
-                                Intermediate
-                            </MenuItem>
-                            <MenuItem value="Expert">Expert</MenuItem>
-                        </Select>
-                    }
-                    label="Cook Time (in minutes):"
-                    labelPlacement="start"
-                ></FormControlLabel>
-            </div>
-
-            <div>
-                <label>Difficulty:</label>
-                <Select
-                    value={difficulty}
-                    onChange={(e) => {
-                        if (stringIsRecipeDifficulty(e.target.value)) {
-                            setDifficulty(e.target.value);
-                        } else {
-                            alert(
-                                `Error: ${difficulty} is not a valid difficulty`,
-                            );
+                                placeholder="Enter recipe name"
+                                required
+                            />
                         }
-                    }}
-                >
-                    <MenuItem value="Easy">Easy</MenuItem>
-                    <MenuItem value="Intermediate">Intermediate</MenuItem>
-                    <MenuItem value="Expert">Expert</MenuItem>
-                </Select>
-            </div>
+                        label="Recipe Name:"
+                        labelPlacement="start"
+                    />
+                </div>
 
-            <div>
-                <label>Ingredients:</label>
-                {ingredients.map((ingredient, index) => (
-                    <div key={index}>
-                        <TextField
-                            type="text"
-                            value={ingredient.name}
-                            onChange={(e) =>
-                                handleIngredientChange(
-                                    index,
-                                    'name',
-                                    e.target.value,
-                                )
-                            }
-                            placeholder={`Ingredient ${index + 1}`}
-                            required
-                        />
-                        <TextField
-                            type="number"
-                            value={ingredient.measurement}
-                            onChange={(e) =>
-                                handleIngredientChange(
-                                    index,
-                                    'measurement',
-                                    e.target.value,
-                                )
-                            }
-                            placeholder={`Amount`}
-                            required
-                        />
-                        <TextField
-                            type="text"
-                            value={ingredient.unit}
-                            onChange={(e) =>
-                                handleIngredientChange(
-                                    index,
-                                    'unit',
-                                    e.target.value,
-                                )
-                            }
-                            placeholder={`unit`}
-                            required
-                        />
-                    </div>
-                ))}
-                <button type="button" onClick={addIngredient}>
-                    Add Ingredient
-                </button>
-            </div>
+                <div>
+                    <FormControlLabel
+                        control={
+                            <TextField
+                                type="text"
+                                value={recipeDescription}
+                                onChange={(e) =>
+                                    setRecipeDescription(e.target.value)
+                                }
+                                placeholder="Enter recipe description"
+                                required
+                            />
+                        }
+                        label="Description:"
+                        labelPlacement="start"
+                    />
+                </div>
+                <div>
+                    <FormControlLabel
+                        control={
+                            <TextField
+                                type="number"
+                                value={prepTime}
+                                onChange={(e) =>
+                                    setPrepTime(Number(e.target.value))
+                                }
+                                required
+                            />
+                        }
+                        label="Prep Time (in minutes):"
+                        labelPlacement="start"
+                    />
+                </div>
 
-            <div>
-                <button type="submit">Submit Recipe</button>
-            </div>
+                <div>
+                    <FormControlLabel
+                        control={
+                            <TextField
+                                type="number"
+                                value={cookTime}
+                                onChange={(e) =>
+                                    setCookTime(Number(e.target.value))
+                                }
+                                required
+                            />
+                        }
+                        label="Cook Time (in minutes):"
+                        labelPlacement="start"
+                    />
+                </div>
+
+                <div>
+                    <FormControlLabel
+                        control={
+                            <Select
+                                value={difficulty}
+                                onChange={(e) => {
+                                    if (
+                                        stringIsRecipeDifficulty(e.target.value)
+                                    ) {
+                                        setDifficulty(e.target.value);
+                                    } else {
+                                        alert(
+                                            `Error: ${difficulty} is not a valid difficulty`,
+                                        );
+                                    }
+                                }}
+                                variant="outlined"
+                            >
+                                <MenuItem value="Easy">Easy</MenuItem>
+                                <MenuItem value="Intermediate">
+                                    Intermediate
+                                </MenuItem>
+                                <MenuItem value="Expert">Expert</MenuItem>
+                            </Select>
+                        }
+                        label="Cook Time (in minutes):"
+                        labelPlacement="start"
+                    />
+                </div>
+
+                <div>
+                    <FormControlLabel
+                        control={
+                            <Select
+                                value={difficulty}
+                                onChange={(e) => {
+                                    if (
+                                        stringIsRecipeDifficulty(e.target.value)
+                                    ) {
+                                        setDifficulty(e.target.value);
+                                    } else {
+                                        alert(
+                                            `Error: ${difficulty} is not a valid difficulty`,
+                                        );
+                                    }
+                                }}
+                                variant="outlined"
+                            >
+                                <MenuItem value="Easy">Easy</MenuItem>
+                                <MenuItem value="Intermediate">
+                                    Intermediate
+                                </MenuItem>
+                                <MenuItem value="Expert">Expert</MenuItem>
+                            </Select>
+                        }
+                        label="Difficulty: "
+                        labelPlacement="start"
+                    />
+                </div>
+
+                <div>
+                    <Typography>Ingredients:</Typography>
+                    {ingredients.map((ingredient, index) => (
+                        <div key={index}>
+                            <TextField
+                                type="text"
+                                value={ingredient.name}
+                                onChange={(e) =>
+                                    handleIngredientChange(
+                                        index,
+                                        'name',
+                                        e.target.value,
+                                    )
+                                }
+                                placeholder={`Ingredient ${index + 1}`}
+                                required
+                            />
+                            <TextField
+                                type="number"
+                                value={ingredient.measurement}
+                                onChange={(e) =>
+                                    handleIngredientChange(
+                                        index,
+                                        'measurement',
+                                        e.target.value,
+                                    )
+                                }
+                                placeholder={`Amount`}
+                                required
+                            />
+                            <TextField
+                                type="text"
+                                value={ingredient.unit}
+                                onChange={(e) =>
+                                    handleIngredientChange(
+                                        index,
+                                        'unit',
+                                        e.target.value,
+                                    )
+                                }
+                                placeholder={`unit`}
+                                required
+                            />
+                        </div>
+                    ))}
+                    <br />
+                    <Button variant="text" onClick={addIngredient}>
+                        Add Ingredient
+                    </Button>
+                </div>
+
+                <br />
+                <br />
+                <br />
+
+                <div>
+                    <Button variant="contained">Submit Recipe</Button>
+                </div>
+            </Stack>
         </form>
     );
 }

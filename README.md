@@ -15,3 +15,15 @@ You will need to have the client and the server running at the same time for the
 ## Misc scripts
 
 Run `npm run api-spec` to open the API specification.
+
+## Future Work
+
+Future potential fixes/improvements/additions:
+
+-   [ ] General styling improvements
+-   [ ] Recipe pictures
+-   [ ] Improve shopping list UX
+-   [ ] Better mobile view(?)
+-   [ ] Tags and ratings
+-   [ ] User accounts
+-   [ ] Fuzzy searching with [match-sorter](https://github.com/kentcdodds/match-sorter)
