@@ -2,7 +2,15 @@ import React, { useContext, useState } from 'react';
 import { PostRecipesBody } from '../../server/routes/postRecipes';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { RecipeDifficulty } from '../App/types';
-import { CircularProgress, Typography } from '@mui/material';
+import {
+    CircularProgress,
+    FormControlLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Typography,
+} from '@mui/material';
+import { Description } from '@mui/icons-material';
 
 export default function RecipeCreationPage() {
     const [recipeCreationStatus, setRecipeCreationStatus] =
@@ -108,54 +116,108 @@ function RecipeCreationForm({
             <h2>Create a New Recipe</h2>
 
             <div>
-                <label>Recipe Name:</label>
-                <input
-                    type="text"
-                    value={recipeName}
-                    onChange={(e) => setRecipeName(e.target.value)}
-                    placeholder="Enter recipe name"
-                    required
-                />
+                <FormControlLabel
+                    control={
+                        <TextField
+                            type="text"
+                            value={recipeName}
+                            onChange={(e) =>
+                                setRecipeDescription(e.target.value)
+                            }
+                            placeholder="Enter recipe name"
+                            required
+                            InputLabelProps={{ required: false }}
+                        />
+                    }
+                    label="Recipe Name:"
+                    labelPlacement="start"
+                ></FormControlLabel>
             </div>
 
             <div>
-                <label>Description:</label>
-                <input
-                    type="text"
-                    value={recipeDescription}
-                    onChange={(e) => setRecipeDescription(e.target.value)}
-                    placeholder="Enter recipe description"
-                    required
-                />
+                <FormControlLabel
+                    control={
+                        <TextField
+                            type="text"
+                            value={recipeDescription}
+                            onChange={(e) =>
+                                setRecipeDescription(e.target.value)
+                            }
+                            placeholder="Enter recipe description"
+                            required
+                            InputLabelProps={{ required: false }}
+                        />
+                    }
+                    label="Description:"
+                    labelPlacement="start"
+                ></FormControlLabel>
+            </div>
+            <div>
+                <FormControlLabel
+                    control={
+                        <TextField
+                            type="number"
+                            value={prepTime}
+                            onChange={(e) =>
+                                setPrepTime(Number(e.target.value))
+                            }
+                            required
+                            InputLabelProps={{ required: false }}
+                        />
+                    }
+                    label="Prep Time (in minutes):"
+                    labelPlacement="start"
+                ></FormControlLabel>
             </div>
 
             <div>
-                <label>Prep Time (in minutes):</label>
-                <input
-                    type="number"
-                    value={prepTime}
-                    onChange={(e) => setPrepTime(Number(e.target.value))}
-                    min="1"
-                    max="1000"
-                    required
-                />
+                <FormControlLabel
+                    control={
+                        <TextField
+                            type="number"
+                            value={cookTime}
+                            onChange={(e) =>
+                                setCookTime(Number(e.target.value))
+                            }
+                            required
+                            InputLabelProps={{ required: false }}
+                        />
+                    }
+                    label="Cook Time (in minutes):"
+                    labelPlacement="start"
+                ></FormControlLabel>
             </div>
 
             <div>
-                <label>Cook Time (in minutes):</label>
-                <input
-                    type="number"
-                    value={cookTime}
-                    onChange={(e) => setCookTime(Number(e.target.value))}
-                    min="1"
-                    max="1000"
-                    required
-                />
+                <FormControlLabel
+                    control={
+                        <Select
+                            value={difficulty}
+                            onChange={(e) => {
+                                if (stringIsRecipeDifficulty(e.target.value)) {
+                                    setDifficulty(e.target.value);
+                                } else {
+                                    alert(
+                                        `Error: ${difficulty} is not a valid difficulty`,
+                                    );
+                                }
+                            }}
+                        >
+                            <MenuItem value="Easy">Easy</MenuItem>
+                            <MenuItem value="Intermediate">
+                                Intermediate
+                            </MenuItem>
+                            <MenuItem value="Expert">Expert</MenuItem>
+                        </Select>
+                    }
+                    label="Cook Time (in minutes):"
+                    labelPlacement="start"
+                ></FormControlLabel>
             </div>
 
             <div>
                 <label>Difficulty:</label>
-                <select
+                <Select
                     value={difficulty}
                     onChange={(e) => {
                         if (stringIsRecipeDifficulty(e.target.value)) {
@@ -167,17 +229,17 @@ function RecipeCreationForm({
                         }
                     }}
                 >
-                    <option value="Easy">Easy</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Expert">Expert</option>
-                </select>
+                    <MenuItem value="Easy">Easy</MenuItem>
+                    <MenuItem value="Intermediate">Intermediate</MenuItem>
+                    <MenuItem value="Expert">Expert</MenuItem>
+                </Select>
             </div>
 
             <div>
                 <label>Ingredients:</label>
                 {ingredients.map((ingredient, index) => (
                     <div key={index}>
-                        <input
+                        <TextField
                             type="text"
                             value={ingredient.name}
                             onChange={(e) =>
@@ -190,7 +252,7 @@ function RecipeCreationForm({
                             placeholder={`Ingredient ${index + 1}`}
                             required
                         />
-                        <input
+                        <TextField
                             type="number"
                             value={ingredient.measurement}
                             onChange={(e) =>
@@ -203,7 +265,7 @@ function RecipeCreationForm({
                             placeholder={`Amount`}
                             required
                         />
-                        <input
+                        <TextField
                             type="text"
                             value={ingredient.unit}
                             onChange={(e) =>
