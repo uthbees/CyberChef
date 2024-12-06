@@ -3,6 +3,7 @@ import { PostRecipesBody } from '../../server/routes/postRecipes';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
 import { RecipeDifficulty } from '../App/types';
 import {
+    Button,
     CircularProgress,
     FormControlLabel,
     MenuItem,
@@ -246,7 +247,7 @@ function RecipeCreationForm({
                 </div>
 
                 <div>
-                    <label>Ingredients:</label>
+                    <Typography>Ingredients:</Typography>
                     {ingredients.map((ingredient, index) => (
                         <div key={index}>
                             <TextField
@@ -290,13 +291,18 @@ function RecipeCreationForm({
                             />
                         </div>
                     ))}
-                    <button type="button" onClick={addIngredient}>
+                    <br />
+                    <Button variant="text" onClick={addIngredient}>
                         Add Ingredient
-                    </button>
+                    </Button>
                 </div>
 
+                <br />
+                <br />
+                <br />
+
                 <div>
-                    <button type="submit">Submit Recipe</button>
+                    <Button variant="contained">Submit Recipe</Button>
                 </div>
             </Stack>
         </form>
