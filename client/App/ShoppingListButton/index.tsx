@@ -20,7 +20,13 @@ export default function ShoppingListButton() {
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
             >
-                <div style={{ width: '50vw', overflowX: 'auto' }}>
+                <div
+                    style={{
+                        width: '35vw',
+                        overflowX: 'auto',
+                        overflowX: 'auto',
+                    }}
+                >
                     <Stack
                         direction="row"
                         sx={{
