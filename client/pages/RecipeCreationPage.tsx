@@ -10,7 +10,6 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { Description } from '@mui/icons-material';
 
 export default function RecipeCreationPage() {
     const [recipeCreationStatus, setRecipeCreationStatus] =
@@ -126,12 +125,11 @@ function RecipeCreationForm({
                             }
                             placeholder="Enter recipe name"
                             required
-                            InputLabelProps={{ required: false }}
                         />
                     }
                     label="Recipe Name:"
                     labelPlacement="start"
-                ></FormControlLabel>
+                />
             </div>
 
             <div>
@@ -145,12 +143,11 @@ function RecipeCreationForm({
                             }
                             placeholder="Enter recipe description"
                             required
-                            InputLabelProps={{ required: false }}
                         />
                     }
                     label="Description:"
                     labelPlacement="start"
-                ></FormControlLabel>
+                />
             </div>
             <div>
                 <FormControlLabel
@@ -162,12 +159,11 @@ function RecipeCreationForm({
                                 setPrepTime(Number(e.target.value))
                             }
                             required
-                            InputLabelProps={{ required: false }}
                         />
                     }
                     label="Prep Time (in minutes):"
                     labelPlacement="start"
-                ></FormControlLabel>
+                />
             </div>
 
             <div>
@@ -180,12 +176,11 @@ function RecipeCreationForm({
                                 setCookTime(Number(e.target.value))
                             }
                             required
-                            InputLabelProps={{ required: false }}
                         />
                     }
                     label="Cook Time (in minutes):"
                     labelPlacement="start"
-                ></FormControlLabel>
+                />
             </div>
 
             <div>
@@ -202,6 +197,7 @@ function RecipeCreationForm({
                                     );
                                 }
                             }}
+                            variant="outlined"
                         >
                             <MenuItem value="Easy">Easy</MenuItem>
                             <MenuItem value="Intermediate">
@@ -212,7 +208,7 @@ function RecipeCreationForm({
                     }
                     label="Cook Time (in minutes):"
                     labelPlacement="start"
-                ></FormControlLabel>
+                />
             </div>
 
             <div>
@@ -228,6 +224,7 @@ function RecipeCreationForm({
                             );
                         }
                     }}
+                    variant="outlined"
                 >
                     <MenuItem value="Easy">Easy</MenuItem>
                     <MenuItem value="Intermediate">Intermediate</MenuItem>
