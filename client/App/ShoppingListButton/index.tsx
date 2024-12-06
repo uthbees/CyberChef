@@ -3,6 +3,7 @@ import { useState } from 'react';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingList from './ShoppingList';
 import { Close } from '@mui/icons-material';
+import ShoppingBadges from './ShoppingBadges';
 
 export default function ShoppingListButton() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -12,14 +13,14 @@ export default function ShoppingListButton() {
             <IconButton
                 onClick={() => setDrawerOpen((prevState) => !prevState)}
             >
-                <ShoppingCartIcon htmlColor="white" />
+                <ShoppingBadges />
             </IconButton>
             <Drawer
                 anchor="right"
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
             >
-                <div style={{ width: '50vw' }}>
+                <div style={{ width: '50vw', overflowX: 'auto' }}>
                     <Stack
                         direction="row"
                         sx={{
