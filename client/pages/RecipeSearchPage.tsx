@@ -121,10 +121,10 @@ function IntroHeader() {
             id="IntroHeader"
             sx={{
                 textAlign: 'center',
-                marginBottom: 10,
+                marginBottom: '75px',
             }}
         >
-            <h1 style={{ fontFamily: 'Rokkitt' }}>Recipe Search Page</h1>
+            <h1 style={{ fontFamily: 'Rokkitt' }}>Search for Recipes</h1>
             <p style={{ fontFamily: 'Montserrat' }}>
                 Find your next great meal!
             </p>
