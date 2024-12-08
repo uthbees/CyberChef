@@ -80,7 +80,7 @@ function RecipeCreationForm({
         const newIngredients = [...ingredients];
         newIngredients[index] = {
             ...newIngredients[index],
-            [field]: value,
+            [field]: field === 'measurement' ? Number(value) : value,
         };
         setIngredients(newIngredients);
     };
