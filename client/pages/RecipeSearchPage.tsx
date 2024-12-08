@@ -4,6 +4,7 @@ import {
     createContext,
     useContext,
     useState,
+    useEffect,
 } from 'react';
 import {
     Button,
@@ -18,12 +19,16 @@ import {
     TextField,
     Chip,
     Fab,
+    Zoom,
 } from '@mui/material';
+
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+
 import { SelectedRecipesContext } from '../App/SelectedRecipesContextProvider';
 import RecipeDialog from './dialog';
 import { AllRecipesContext } from '../App/AllRecipesContextProvider';
@@ -64,6 +69,8 @@ RecipeSearchPage
                 RecipeCardTags - p
             AddToShoppingListButton - button
                 Toggles to RemoveFromShoppingListButton
+            ShowRecipeButton - button
+                Reveals RecipeDialog
     ScrollToTopButton
 */
 
@@ -102,8 +109,7 @@ export default function RecipeSearchPage() {
                 <IntroHeader />
                 <SearchDiv />
                 <SearchResults />
-
-                {/* <Button onClick={scrollToTop}>Scroll To Top</Button> */}
+                <ScrollToTopButton />
             </SearchPageContext.Provider>
         </div>
     );
@@ -733,9 +739,49 @@ function AddToShoppingListButton(p: { recipe: Recipe }) {
             color={recipeIsIncluded ? 'primary' : 'primary'}
             onClick={() => handleClick(p.recipe)}
         >
-            {/*<AddIcon />*/}
             {recipeIsIncluded ? <RemoveIcon /> : <AddIcon />}
         </IconButton>
+    );
+}
+
+function ScrollToTopButton() {
+    const [isVisible, setIsVisible] = useState(false);
+    const handleScroll = () => {
+        if (window.scrollY > 300) {
+            setIsVisible(true);
+        } else {
+            setIsVisible(false);
+        }
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    return (
+        <Zoom in={isVisible}>
+            <Fab
+                onClick={scrollToTop}
+                color="primary"
+                style={{
+                    position: 'fixed',
+                    bottom: '50px',
+                    right: '50px',
+                }}
+            >
+                <ArrowUpwardIcon />
+            </Fab>
+        </Zoom>
     );
 }
 

@@ -1,8 +1,8 @@
 import { Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingList from './ShoppingList';
 import { Close } from '@mui/icons-material';
+import ShoppingListIcon from './ShoppingListIcon';
 
 export default function ShoppingListButton() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -12,14 +12,19 @@ export default function ShoppingListButton() {
             <IconButton
                 onClick={() => setDrawerOpen((prevState) => !prevState)}
             >
-                <ShoppingCartIcon htmlColor="white" />
+                <ShoppingListIcon />
             </IconButton>
             <Drawer
                 anchor="right"
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
             >
-                <div style={{ width: '35vw', overflowX: 'auto' }}>
+                <div
+                    style={{
+                        width: '35vw',
+                        overflowX: 'auto',
+                    }}
+                >
                     <Stack
                         direction="row"
                         sx={{
