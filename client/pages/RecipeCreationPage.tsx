@@ -123,9 +123,7 @@ function RecipeCreationForm({
                             <TextField
                                 type="text"
                                 value={recipeName}
-                                onChange={(e) =>
-                                    setRecipeDescription(e.target.value)
-                                }
+                                onChange={(e) => setRecipeName(e.target.value)}
                                 placeholder="Enter recipe name"
                                 required
                             />
@@ -186,7 +184,7 @@ function RecipeCreationForm({
                     />
                 </div>
 
-                <div>
+                {/* <div>
                     <FormControlLabel
                         control={
                             <Select
@@ -214,7 +212,7 @@ function RecipeCreationForm({
                         label="Cook Time (in minutes):"
                         labelPlacement="start"
                     />
-                </div>
+                </div> */}
 
                 <div>
                     <FormControlLabel
@@ -302,7 +300,9 @@ function RecipeCreationForm({
                 <br />
 
                 <div>
-                    <Button variant="contained">Submit Recipe</Button>
+                    <Button variant="contained" type="submit">
+                        Submit Recipe
+                    </Button>
                 </div>
             </Stack>
         </form>
