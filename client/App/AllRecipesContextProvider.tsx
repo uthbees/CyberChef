@@ -3,7 +3,7 @@ import { Recipe, RecipeDifficulty } from './types';
 import useInitialSetup from '../utils/useInitialSetup';
 import serverUrl from './config/serverUrl';
 import { PostRecipesBody } from '../../server/routes/postRecipes';
-import { ApiRecipe } from '../../server/routes/getRecipes';
+import { ApiIngredient, ApiRecipe } from '../../server/routes/getRecipes';
 
 export default function AllRecipesContextProvider({
     children,
@@ -38,6 +38,29 @@ export default function AllRecipesContextProvider({
                 const recipesObject: Record<string, Recipe> = {};
 
                 decoded.forEach((recipe: ApiRecipe) => {
+                    const ingredients = recipe.ingredients;
+                    // Quick fix for the demo
+                    const dedupedIngredients: ApiIngredient[] = [];
+                    ingredients.forEach((ingredient) => {
+                        if (
+                            !dedupedIngredients.find(
+                                (dedupedIngredient) =>
+                                    dedupedIngredient.name === ingredient.name,
+                            )
+                        ) {
+                            dedupedIngredients.push(ingredient);
+                        }
+                    });
+
+                    const instructions = recipe.instructions;
+                    // Quick fix for the demo
+                    const dedupedInstructions: string[] = [];
+                    instructions.forEach((instruction) => {
+                        if (!dedupedInstructions.includes(instruction)) {
+                            dedupedInstructions.push(instruction);
+                        }
+                    });
+
                     recipesObject[recipe.uuid] = {
                         uuid: recipe.uuid,
                         name: recipe.name,
@@ -45,8 +68,8 @@ export default function AllRecipesContextProvider({
                         difficulty: recipe.difficulty as RecipeDifficulty,
                         prepTimeMin: recipe.prep_time,
                         cookTimeMin: recipe.cook_time,
-                        ingredients: recipe.ingredients,
-                        instructions: recipe.instructions,
+                        ingredients: dedupedIngredients,
+                        instructions: dedupedInstructions,
                         note: recipe.notes,
                     };
                 });

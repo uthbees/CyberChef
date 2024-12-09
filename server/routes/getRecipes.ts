@@ -13,7 +13,7 @@ export interface ApiRecipe {
     notes: string;
 }
 
-interface ApiIngredient {
+export interface ApiIngredient {
     name: string;
     quantity: number;
     unit?: string;
