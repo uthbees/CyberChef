@@ -62,7 +62,9 @@ function RecipeCreationForm({
     const [difficulty, setDifficulty] = useState<RecipeDifficulty>('Easy');
     const [ingredients, setIngredients] = useState<
         { name: string; measurement: number; unit: string }[]
-    >([{ name: '', measurement: 1, unit: '' }]); // Start with one ingredient input
+    >([{ name: '', measurement: 1, unit: '' }]);
+    const [instructions, setInstructions] = useState<string[]>(['']);
+    const [notes, setNotes] = useState(''); // Start with one ingredient input
 
     // Add a new ingredient input
     const addIngredient = () => {
@@ -70,6 +72,10 @@ function RecipeCreationForm({
             ...ingredients,
             { name: '', measurement: 1, unit: '' },
         ]);
+    };
+
+    const addInstruction = () => {
+        setInstructions([...instructions, '']);
     };
 
     // Handle ingredient input change
@@ -84,6 +90,12 @@ function RecipeCreationForm({
             [field]: field === 'measurement' ? Number(value) : value,
         };
         setIngredients(newIngredients);
+    };
+
+    const handleInstructionChange = (index: number, value: string) => {
+        const newInstructions = [...instructions];
+        newInstructions[index] = value;
+        setInstructions(newInstructions);
     };
 
     return (
@@ -116,8 +128,8 @@ function RecipeCreationForm({
                             quantity: ingredient.measurement, // TODO
                             unit: ingredient.unit,
                         })),
-                        instructions: [], // TODO
-                        notes: '', // TODO
+                        instructions: instructions, // TODO
+                        notes: notes, // TODO
                     };
 
                     createRecipe(requestBody, {
@@ -359,7 +371,67 @@ function RecipeCreationForm({
                             Add Ingredient
                         </Button>
                     </div>
-
+                    <div style={{ margin: 'auto' }}>
+                        <Typography marginBottom={'12px'} marginTop={'20px'}>
+                            Instructions:
+                        </Typography>
+                        <Grid2
+                            container
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            marginX={'125px'}
+                            spacing={'25px'}
+                        >
+                            {instructions.map((instruction, index) => (
+                                <Grid2
+                                    container
+                                    size={12}
+                                    columns={16}
+                                    spacing={'10px'}
+                                    key={index}
+                                >
+                                    <Grid2 size={100}>
+                                        <TextField
+                                            sx={{ bgcolor: '#F4F2EC' }}
+                                            type="text"
+                                            value={instruction}
+                                            onChange={(e) =>
+                                                handleInstructionChange(
+                                                    index,
+                                                    e.target.value,
+                                                )
+                                            }
+                                            label={`Instruction ${index + 1}`}
+                                            fullWidth
+                                            required
+                                        />
+                                    </Grid2>
+                                </Grid2>
+                            ))}
+                        </Grid2>
+                        <br />
+                        <Button variant="text" onClick={addInstruction}>
+                            Add Instruction
+                        </Button>
+                    </div>
+                    <div>
+                        <FormControlLabel
+                            control={
+                                <TextField
+                                    sx={{ bgcolor: '#F4F2EC' }}
+                                    style={{ margin: 8, width: '500px' }}
+                                    type="text"
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    label="Enter notes"
+                                    required
+                                />
+                            }
+                            label="Additional Notes:"
+                            labelPlacement="start"
+                        />
+                    </div>
                     <br />
                     <br />
                     <br />

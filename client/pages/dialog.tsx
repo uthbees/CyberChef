@@ -9,7 +9,6 @@ import {
     DialogActions,
     Button,
     Typography,
-    Breadcrumbs,
 } from '@mui/material';
 
 // interface Recipe {
@@ -43,6 +42,39 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
     if (!recipe) {
         // alert('No recipe found');
         return null;
+    }
+    if (recipe.note === '') {
+        return (
+            <Dialog open={open} onClose={onClose}>
+                <DialogTitle>
+                    <Typography variant="h2">
+                        {toTitleCase(recipe.name)}
+                    </Typography>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="h5">
+                        <p> Prep time: {recipe.prepTimeMin} Minutes </p>
+                        <p> Cook time: {recipe.cookTimeMin} Minutes </p>
+                        <p> Description: {recipe.description}</p>
+                        <p> Difficulty: {recipe.difficulty}</p>
+                        <p>Ingredients:</p>
+                        <ul>
+                            {recipe.ingredients.map((ingredient, index) => (
+                                <li key={index}>
+                                    {ingredient.quantity} {ingredient.unit}{' '}
+                                    {ingredient.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onClose} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        );
     }
     if (recipe.instructions.length === 0) {
         if (recipe.note === '') {
@@ -81,14 +113,16 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
         return (
             <Dialog open={open} onClose={onClose}>
                 <DialogTitle>
-                    <Typography variant="h2">{recipe.name}</Typography>
+                    <Typography variant="h2">
+                        {toTitleCase(recipe.name)}
+                    </Typography>
                 </DialogTitle>
                 <DialogContent>
                     <Typography variant="h5">
-                        <p> prep time:{recipe.prepTimeMin} </p>
-                        <p> cook time:{recipe.cookTimeMin} </p>
-                        <p> Description: {recipe.description}</p>
-                        <p> Difficulty: {recipe.difficulty}</p>
+                        <p> prep time: {recipe.prepTimeMin} Minutes</p>
+                        <p> cook time: {recipe.cookTimeMin} Minutes</p>
+                        <p> Description: {recipe.description} </p>
+                        <p> Difficulty: {recipe.difficulty} </p>
                         <ul>
                             {recipe.ingredients.map((ingredient, index) => (
                                 <li key={index}>
@@ -112,12 +146,12 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>
-                <Typography variant="h2">{recipe.name}</Typography>
+                <Typography variant="h2">{toTitleCase(recipe.name)}</Typography>
             </DialogTitle>
             <DialogContent>
                 <Typography variant="h5">
-                    <p> prep time:{recipe.prepTimeMin} </p>
-                    <p> cook time:{recipe.cookTimeMin} </p>
+                    <p> prep time: {recipe.prepTimeMin} Minutes</p>
+                    <p> cook time: {recipe.cookTimeMin} Minutes</p>
                     <p> Description: {recipe.description}</p>
                     <p> Difficulty: {recipe.difficulty}</p>
                     <p>Ingredients:</p>
