@@ -672,9 +672,13 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
                 }}
             >
                 <h2
-                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontFamily: 'Rokkitt',
+                    }}
                 >
-                    <div style={{ fontFamily: 'Rokkitt' }}>{p.recipe.name}</div>
+                    {p.recipe.name}
                 </h2>
                 <p>Difficulty: {p.recipe.difficulty}</p>
                 <p>Time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
@@ -689,34 +693,6 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
                 <AddToShoppingListButton recipe={p.recipe} />
             </div>
         </Grid2>
-    );
-}
-
-function ShowRecipeButton(p: { recipe: Recipe }) {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const handleOpenDialog = () => {
-        setIsDialogOpen(true);
-    };
-    const handleCloseDialog = () => {
-        setIsDialogOpen(false);
-    };
-
-    return (
-        <div>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleOpenDialog}
-            >
-                Show Details
-            </Button>
-            <RecipeDialog
-                open={isDialogOpen}
-                onClose={handleCloseDialog}
-                recipe={p.recipe}
-            />
-        </div>
     );
 }
 
@@ -746,7 +722,7 @@ function AddToShoppingListButton(p: { recipe: Recipe }) {
 
     return (
         <IconButton
-            color={recipeIsIncluded ? 'primary' : 'primary'}
+            color={recipeIsIncluded ? 'error' : 'primary'}
             onClick={() => handleClick(p.recipe)}
         >
             {recipeIsIncluded ? <RemoveIcon /> : <AddIcon />}
