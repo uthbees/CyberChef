@@ -125,11 +125,11 @@ function RecipeCreationForm({
                         cook_time: cookTime,
                         ingredients: ingredients.map((ingredient) => ({
                             name: ingredient.name,
-                            quantity: ingredient.measurement, // TODO
+                            quantity: ingredient.measurement,
                             unit: ingredient.unit,
                         })),
-                        instructions: instructions, // TODO
-                        notes: notes, // TODO
+                        instructions: instructions,
+                        notes: notes,
                     };
 
                     createRecipe(requestBody, {
@@ -424,8 +424,7 @@ function RecipeCreationForm({
                                     type="text"
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    label="Enter notes"
-                                    required
+                                    label="Enter notes (optional)"
                                 />
                             }
                             label="Additional Notes:"

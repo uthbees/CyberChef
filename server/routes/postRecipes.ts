@@ -72,7 +72,7 @@ const postRecipes: RequestHandler = async (req, res) => {
 export default postRecipes;
 
 const ingredient = type({
-    quantity: type.number.atLeast(1),
+    quantity: type.number.atLeast(0),
     'unit?': type.string.atLeastLength(1).atMostLength(100),
     name: type.string.atLeastLength(1).atMostLength(100),
 });
@@ -81,8 +81,8 @@ const postRecipesBody = type({
     name: type.string.atLeastLength(1).atMostLength(100),
     description: type.string.atLeastLength(1).atMostLength(5000),
     difficulty: "'Easy' | 'Intermediate' | 'Expert'",
-    prep_time: type.number.atLeast(1).atMost(1000),
-    cook_time: type.number.atLeast(1).atMost(1000),
+    prep_time: type.number.atLeast(0).atMost(1000),
+    cook_time: type.number.atLeast(0).atMost(1000),
     ingredients: ingredient.array(),
     instructions: type.string.atLeastLength(1).atMostLength(1000).array(),
     notes: type.string.atLeastLength(0).atMostLength(5000),
