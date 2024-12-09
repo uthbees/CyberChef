@@ -49,8 +49,11 @@ interface RecipeQueryResult {
 const getRecipes: RequestHandler = async (req, res) => {
     try {
         const db = await openDb();
-        // WARNING: This query returns a cartesian product. I'm not sure of the best way to fix it, so since
-        // the project is pretty much over, we're leaving it.
+        // WARNING: This query returns a cartesian product. The way to fix it would
+        // be with a UNION: https://stackoverflow.com/questions/14540736/sql-avoid-cartesian-product
+        // or by making (for example) the instructions query separately (which we
+        // can do because we're just getting all the data), but since the project is
+        // pretty much over, we probably won't bother.
         const rows = await db.all(
             'SELECT' +
                 ' Recipes.uuid, Recipes.name AS recipe_name, Recipes.description, Recipes.difficulty,' +
