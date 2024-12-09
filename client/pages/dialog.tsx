@@ -9,18 +9,9 @@ import {
     DialogActions,
     Button,
     Typography,
+    Chip,
+    Divider,
 } from '@mui/material';
-
-// interface Recipe {
-//     name: string;
-//     description: string;
-//     difficulty: RecipeDifficulty;
-//     prepTimeMin: number;
-//     cookTimeMin: number;
-//     ingredients: Array<string>;
-//     instructions: Array<string>;
-//     note: string;
-// }
 
 interface RecipeDialogProps {
     open: boolean;
@@ -47,14 +38,34 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>
-                <Typography variant="h2">{toTitleCase(recipe.name)}</Typography>
+                <Typography variant="h3">{toTitleCase(recipe.name)}</Typography>
             </DialogTitle>
-            <DialogContent>
-                <Typography variant="h5">
-                    <p> prep time: {recipe.prepTimeMin} Minutes</p>
-                    <p> cook time: {recipe.cookTimeMin} Minutes</p>
-                    <p> Description: {recipe.description}</p>
-                    <p> Difficulty: {recipe.difficulty}</p>
+            <DialogContent style={{ width: 600 }}>
+                <Typography variant="body2" fontSize={16}>
+                    <p>
+                        Prep time: {recipe.prepTimeMin} minutes
+                        <br />
+                        Cook time: {recipe.cookTimeMin} minutes
+                        <br />
+                        Total time: {recipe.prepTimeMin +
+                            recipe.cookTimeMin}{' '}
+                        minutes
+                    </p>
+                    <p>
+                        Difficulty:{' '}
+                        <Chip
+                            label={recipe.difficulty}
+                            color={
+                                recipe.difficulty === 'Easy'
+                                    ? 'success'
+                                    : recipe.difficulty === 'Intermediate'
+                                      ? 'warning'
+                                      : 'error'
+                            }
+                        />
+                    </p>
+                    <p>{recipe.description}</p>
+                    <Divider />
                     <p>Ingredients:</p>
                     <ul>
                         {recipe.ingredients.map((ingredient, index) => (
@@ -84,12 +95,7 @@ const RecipeDialog: React.FC<RecipeDialogProps> = ({
                     })()}
                     {(() => {
                         if (recipe.note !== '') {
-                            return (
-                                <>
-                                    <p>Additional Notes:</p>
-                                    <p>{recipe.note}</p>
-                                </>
-                            );
+                            return <p>{recipe.note}</p>;
                         }
                     })()}
                 </Typography>
