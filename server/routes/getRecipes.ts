@@ -49,6 +49,8 @@ interface RecipeQueryResult {
 const getRecipes: RequestHandler = async (req, res) => {
     try {
         const db = await openDb();
+        // WARNING: This query returns a cartesian product. I'm not sure of the best way to fix it, so since
+        // the project is pretty much over, we're leaving it.
         const rows = await db.all(
             'SELECT' +
                 ' Recipes.uuid, Recipes.name AS recipe_name, Recipes.description, Recipes.difficulty,' +
