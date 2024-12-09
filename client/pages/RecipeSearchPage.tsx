@@ -653,9 +653,16 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
     //     tags = tags.substring(0, tagCutOff - 3) + '...';
     // }
 
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
     return (
-        <Grid2 key={p.index} size={4}>
+        <Grid2
+            key={p.index}
+            size={4}
+            style={{ position: 'relative', cursor: 'pointer' }}
+        >
             <Box
+                onClick={() => setIsDialogOpen(true)}
                 sx={{
                     border: '4px solid #BA1F11',
                     borderRadius: 3,
@@ -668,16 +675,19 @@ function RecipeCard(p: { recipe: Recipe; index: number }) {
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                     <div style={{ fontFamily: 'Rokkitt' }}>{p.recipe.name}</div>
-                    <AddToShoppingListButton recipe={p.recipe} />
                 </h2>
                 <p>Difficulty: {p.recipe.difficulty}</p>
                 <p>Time: {p.recipe.prepTimeMin + p.recipe.cookTimeMin} min</p>
-                {/* <p>Tags: {tags}</p> */}
-                <Box mb={2}>
-                    <ShowRecipeButton recipe={p.recipe} />
-                </Box>
                 <Box mb={2}></Box>
             </Box>
+            <RecipeDialog
+                open={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                recipe={p.recipe}
+            />
+            <div style={{ position: 'absolute', top: 16, right: 16 }}>
+                <AddToShoppingListButton recipe={p.recipe} />
+            </div>
         </Grid2>
     );
 }
