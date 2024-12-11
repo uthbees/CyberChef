@@ -169,6 +169,7 @@ function RecipeCreationForm({
                                     }
                                     label="Enter recipe name"
                                     required
+                                    spellCheck
                                 />
                             }
                             label="Recipe Name:"
@@ -188,6 +189,7 @@ function RecipeCreationForm({
                                     }
                                     label="Enter description"
                                     required
+                                    spellCheck
                                 />
                             }
                             label="Description:"
@@ -206,6 +208,7 @@ function RecipeCreationForm({
                                         setPrepTime(Number(e.target.value))
                                     }
                                     required
+                                    spellCheck
                                 />
                             }
                             label="Prep Time (minutes):"
@@ -223,6 +226,7 @@ function RecipeCreationForm({
                                         setCookTime(Number(e.target.value))
                                     }
                                     required
+                                    spellCheck
                                 />
                             }
                             label="Cook Time (minutes):"
@@ -261,37 +265,6 @@ function RecipeCreationForm({
                         />
                     </div>
 
-                    {/* <div>
-                    <FormControlLabel
-                        control={
-                            <Select
-                                style={{ margin: 8 }}
-                                value={difficulty}
-                                onChange={(e) => {
-                                    if (
-                                        stringIsRecipeDifficulty(e.target.value)
-                                    ) {
-                                        setDifficulty(e.target.value);
-                                    } else {
-                                        alert(
-                                            `Error: ${difficulty} is not a valid difficulty`,
-                                        );
-                                    }
-                                }}
-                                variant="outlined"
-                            >
-                                <MenuItem value="Easy">Easy</MenuItem>
-                                <MenuItem value="Intermediate">
-                                    Intermediate
-                                </MenuItem>
-                                <MenuItem value="Expert">Expert</MenuItem>
-                            </Select>
-                        }
-                        label="Cook Time (in minutes):"
-                        labelPlacement="start"
-                    />
-                </div> */}
-
                     <div style={{ margin: 'auto' }}>
                         <Typography marginBottom={'12px'} marginTop={'20px'}>
                             Ingredients:
@@ -327,6 +300,7 @@ function RecipeCreationForm({
                                             label={`Ingredient ${index + 1}`}
                                             fullWidth
                                             required
+                                            spellCheck
                                         />
                                     </Grid2>
                                     <Grid2 size={2}>
@@ -361,6 +335,7 @@ function RecipeCreationForm({
                                             label={`Unit`}
                                             fullWidth
                                             required
+                                            spellCheck
                                         />
                                     </Grid2>
                                 </Grid2>
@@ -405,6 +380,7 @@ function RecipeCreationForm({
                                             label={`Instruction ${index + 1}`}
                                             fullWidth
                                             required
+                                            spellCheck
                                         />
                                     </Grid2>
                                 </Grid2>
@@ -425,6 +401,7 @@ function RecipeCreationForm({
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                     label="Enter notes (optional)"
+                                    spellCheck
                                 />
                             }
                             label="Additional Notes:"
